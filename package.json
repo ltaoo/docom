@@ -128,5 +128,8 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "mark-twain": "^2.0.3"
   }
 }
