@@ -1,5 +1,3 @@
-'use strict';
-
 // Do this as the first thing so that any code reading it knows the right env.
 process.env.BABEL_ENV = 'development';
 process.env.NODE_ENV = 'development';
@@ -14,8 +12,8 @@ process.on('unhandledRejection', err => {
 // Ensure environment variables are read.
 require('../config/env');
 
-
 const fs = require('fs');
+const path = require('path');
 const chalk = require('react-dev-utils/chalk');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
@@ -31,6 +29,37 @@ const openBrowser = require('react-dev-utils/openBrowser');
 const paths = require('../config/paths');
 const configFactory = require('../config/webpack.config');
 const createDevServerConfig = require('../config/webpackDevServer.config');
+
+const config = require(path.join(process.cwd(), 'docom.config'));
+const {
+  format,
+  getFileTree,
+} = require('./utils');
+
+const touch = (file, raw) => new Promise(async (resolve, reject) => {
+  const content = raw;
+  const stream = fs.createWriteStream(file);
+  stream.write(content, 'utf-8');
+  stream.on('finish', () => resolve());
+  stream.on('error', err => reject(err));
+  stream.end();
+});
+
+const formattedConfig = format(config);
+const allFile = getFileTree(formattedConfig.modules, formattedConfig.files);
+// 生成一个 db.js，存储数据，无论什么前端框架都是可以读取的
+try {
+  fs.mkdir(path.resolve(process.cwd(), '.docom'), (err) => {
+    const text = JSON.stringify(allFile, null, '\t')
+      .replace(/"/g, '')
+      .replace(/\{(.*)\}/g, function(match, p) {
+        return `() => import('${p}')`;
+      });
+    touch(path.resolve(process.cwd(), '.docom/db.js'), `module.exports = ${text}`);
+  });
+} catch (err) {
+  console.log(err);
+}
 
 const useYarn = fs.existsSync(paths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;
