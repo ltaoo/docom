@@ -59,9 +59,9 @@
     "workbox-webpack-plugin": "4.2.0"
   },
   "scripts": {
-    "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "start": "node core/scripts/start.js",
+    "build": "node core/scripts/build.js",
+    "test": "node core/scripts/test.js"
   },
   "eslintConfig": {
     "extends": "react-app"

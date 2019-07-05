@@ -1,11 +1,11 @@
-'use strict';
-
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
 
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebook/create-react-app/issues/637
+const bishengDirectory = fs.realpathSync(path.join(process.cwd(), './core'));
+const resolveBishengApp = relativePath => path.resolve(bishengDirectory, relativePath);
 const appDirectory = fs.realpathSync(process.cwd());
 const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
 
@@ -69,9 +69,9 @@ const resolveModule = (resolveFn, filePath) => {
 module.exports = {
   dotenv: resolveApp('.env'),
   appPath: resolveApp('.'),
-  appBuild: resolveApp('build'),
-  appPublic: resolveApp('public'),
-  appHtml: resolveApp('public/index.html'),
+  appBuild: resolveBishengApp('build'),
+  appPublic: resolveBishengApp('public'),
+  appHtml: resolveBishengApp('public/index.html'),
   appIndexJs: resolveModule(resolveApp, 'src/index'),
   appPackageJson: resolveApp('package.json'),
   appSrc: resolveApp('src'),
