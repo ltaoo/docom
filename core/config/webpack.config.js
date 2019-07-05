@@ -459,6 +459,16 @@ module.exports = function(webpackEnv) {
             // This loader doesn't use a "test" so it will catch all modules
             // that fall through the other loaders.
             {
+              test: /\.(md|markdown)$/,
+              loader: require.resolve('../loader'),
+              options: {
+                name: 'test',
+                plugins: [
+                  require.resolve('../loader/plugin'),
+                ],
+              }
+            },
+            {
               loader: require.resolve('file-loader'),
               // Exclude `js` files to keep "css" loader working as it injects
               // its runtime that would otherwise be processed through "file" loader.
