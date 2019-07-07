@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import App from '@root/theme/App';
-import imports from '@root/.docom/db';
+import imports from '@root/.docom/imports';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 

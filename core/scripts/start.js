@@ -34,32 +34,13 @@ const config = require(path.join(process.cwd(), 'docom.config'));
 const {
   format,
   getFileTree,
+  createImportsFile,
 } = require('./utils');
 
-const touch = (file, raw) => new Promise(async (resolve, reject) => {
-  const content = raw;
-  const stream = fs.createWriteStream(file);
-  stream.write(content, 'utf-8');
-  stream.on('finish', () => resolve());
-  stream.on('error', err => reject(err));
-  stream.end();
-});
-
 const formattedConfig = format(config);
-const allFile = getFileTree(formattedConfig.modules, formattedConfig.files);
-// 生成一个 db.js，存储数据，无论什么前端框架都是可以读取的
-try {
-  fs.mkdir(path.resolve(process.cwd(), '.docom'), (err) => {
-    const text = JSON.stringify(allFile, null, '\t')
-      .replace(/"/g, '')
-      .replace(/\{(.*)\}/g, function(match, p) {
-        return `() => import('${p}')`;
-      });
-    touch(path.resolve(process.cwd(), '.docom/db.js'), `module.exports = ${text}`);
-  });
-} catch (err) {
-  console.log(err);
-}
+const fileTree = getFileTree(formattedConfig.modules, formattedConfig.files);
+// 生成一个 imports.js，存储数据，无论什么前端框架都是可以读取的
+createImportsFile(fileTree);
 
 const useYarn = fs.existsSync(paths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;
@@ -140,7 +121,7 @@ checkBrowsers(paths.appPath, isInteractive)
         return console.log(err);
       }
       if (isInteractive) {
-        clearConsole();
+        // clearConsole();
       }
 
       // We used to support resolving modules according to `NODE_PATH`.
@@ -156,7 +137,7 @@ checkBrowsers(paths.appPath, isInteractive)
       }
 
       console.log(chalk.cyan('Starting the development server...\n'));
-      openBrowser(urls.localUrlForBrowser);
+      // openBrowser(urls.localUrlForBrowser);
     });
 
     ['SIGINT', 'SIGTERM'].forEach(function(sig) {
