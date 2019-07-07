@@ -4,10 +4,6 @@ import { Switch, Route, Link } from "react-router-dom";
 import Item from './Item';
 
 export default class Detail extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         const { imports } = this.props;
         console.log(imports);

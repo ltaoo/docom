@@ -8,11 +8,13 @@ export default class DetailItem extends React.Component {
 
         const { location: { pathname }, imports } = props;
         const paths = pathname.split('/').filter(Boolean);
+        console.log(pathname);
         const c = R.path(paths, imports);
         c()
             .then((response) => {
                 console.log(response);
                 this.setState({
+                    meta: response.meta,
                     content: response.content,
                 });
             })
@@ -33,14 +35,14 @@ export default class DetailItem extends React.Component {
     }
 
     render() {
-        const { loading, content } = this.state;
+        const { loading, content, meta } = this.state;
         console.log(content);
         if (loading) {
             return <p>Loading...</p>;
         }
         return (
             <React.Fragment>
-                <h2>Item Page</h2>
+                <h2>{meta.title}</h2>
                 {toReactElement(content)}
             </React.Fragment>
         );

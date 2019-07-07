@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
 import Home from './pages/Home';
 import Detail from './pages/Detail';
 import About from './pages/About';
+import Blogs from './pages/Blogs';
+import BlogDetail from './pages/BlogDetail';
 
 import './App.css';
 
@@ -11,24 +13,22 @@ function App({ imports, source }) {
   return (
     <Router>
       <div>
-        <nav>
-          <ul>
-            {Object.keys(source).map(module => {
-              const { title } = source[module].index.meta;
-              return (
-                <li key={module}><Link to={`/${module}/index`}>{title}</Link></li>
-              );
-            })}
-          </ul>
-        </nav>
         <Switch>
           <Route path="/" exact render={(props) => {
-            return <Home {...props} imports={imports} />;
+            return <Home {...props} source={source} imports={imports} />;
           }} />
-          <Route path="/develop" render={(props) => {
-            return <Detail {...props} imports={imports} />;
+          <Route path="/blog/:id" render={(props) => {
+            return (
+              <BlogDetail
+                key={props.match.params.id}
+                {...props}
+                source={source} imports={imports}
+              />
+            );
           }} />
-          <Route path="/components/" component={About} />
+          <Route path="/blog" exact render={(props) => {
+            return <Blogs {...props} source={source} imports={imports} />;
+          }} />
         </Switch>
       </div>
     </Router>

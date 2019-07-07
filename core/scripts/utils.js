@@ -178,10 +178,13 @@ const touch = (file, raw) => new Promise(async (resolve, reject) => {
 
 function createImportsContent(fileTree) {
   const text = JSON.stringify(fileTree, null, '  ')
-    .replace(/"/g, '')
+    // .replace(/"/g, '')
     .replace(/\{\{(.*)\}\}/g, function(match, p) {
       return `() => import('${p}')`;
-    });
+    })
+    .replace(/"(\(.*\))"/g, function(match, p) {
+      return p;
+    })
   return `module.exports = ${text}`;
 }
 

@@ -117,10 +117,10 @@ describe('utils', () => {
             },
         }; 
         const expectResult = `module.exports = {
-  develop: {
-    index: () => import('@root/docs/develop/index.md'),
-    test: () => import('@root/docs/develop/test.md'),
-    branch: () => import('@root/docs/develop/branch.md')
+  "develop": {
+    "index": () => import('@root/docs/develop/index.md'),
+    "test": () => import('@root/docs/develop/test.md'),
+    "branch": () => import('@root/docs/develop/branch.md')
   }
 }`;
 
