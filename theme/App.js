@@ -7,21 +7,18 @@ import About from './pages/About';
 
 import './App.css';
 
-function App({ imports }) {
+function App({ imports, source }) {
   return (
     <Router>
       <div>
         <nav>
           <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/develop/index">开发说明</Link>
-            </li>
-            <li>
-              <Link to="/users/">Users</Link>
-            </li>
+            {Object.keys(source).map(module => {
+              const { title } = source[module].index.meta;
+              return (
+                <li key={module}><Link to={`/${module}/index`}>{title}</Link></li>
+              );
+            })}
           </ul>
         </nav>
         <Switch>
@@ -31,7 +28,7 @@ function App({ imports }) {
           <Route path="/develop" render={(props) => {
             return <Detail {...props} imports={imports} />;
           }} />
-          <Route path="/about/" component={About} />
+          <Route path="/components/" component={About} />
         </Switch>
       </div>
     </Router>

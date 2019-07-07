@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
+const marktwain = require('mark-twain');
 const R = require('ramda');
 const glob = require('glob');
 const _ = require('lodash');
@@ -134,7 +135,7 @@ function processRelativePath(fileTree) {
             .map(fileName => {
               const relativePath = module[fileName];
               return {
-                [fileName]: action(relativePath)
+                [fileName]: action(relativePath, fileName)
               };
             })
             .reduce((files, addedRootAliasPath) => {
@@ -192,6 +193,17 @@ function createImportsFile(fileTree) {
   });
 }
 
+function createSourceFile(fileTree) {
+  const content = processRelativePath(fileTree)((relativePath, fileName) => {
+    const absolutePath = path.resolve(process.cwd(), relativePath);
+    // 在这里解析完返回？
+    return marktwain(fs.readFileSync(absolutePath, 'utf-8'));
+  });
+  fs.mkdir(path.resolve(process.cwd(), '.docom'), (err) => {
+    touch(path.resolve(process.cwd(), '.docom/source.json'), JSON.stringify(content));
+  });
+}
+
 module.exports = {
   format,
   toMatch,
@@ -202,4 +214,5 @@ module.exports = {
   addRootAlias,
   addPlaceholder,
   createImportsContent,
+  createSourceFile,
 };

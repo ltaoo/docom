@@ -35,11 +35,12 @@ const {
   format,
   getFileTree,
   createImportsFile,
+  createSourceFile,
 } = require('./utils');
 
 const formattedConfig = format(config);
 const fileTree = getFileTree(formattedConfig.modules, formattedConfig.files);
-// 生成一个 imports.js，存储数据，无论什么前端框架都是可以读取的
+createSourceFile(fileTree);
 createImportsFile(fileTree);
 
 const useYarn = fs.existsSync(paths.yarnLockFile);
