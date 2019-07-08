@@ -1,0 +1,31 @@
+.item {
+    margin-bottom: 1em;
+}
+
+.item__title {
+    font-size: 16px;
+    margin-bottom: 0;
+}
+
+.item__date {
+    display: inline-block;
+    width: 80px;
+    font: normal 12px monospace;
+    color: #999;
+}
+
+.item__link {
+    color: #111;
+    word-wrap: break-word;
+    text-decoration: none;
+}
+
+.item__description {
+    color: #565655;
+    font-size: 16px;
+    padding-left: 84px;
+}
+
+.item__summary {
+    margin: 0;
+}

@@ -1,0 +1,14 @@
+.document {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 30px 10px;
+
+    font: 400 18px/1.62 "Georgia", "Xin Gothic", "Hiragino Sans GB", "Droid Sans Fallback", "Microsoft YaHei", sans-serif;
+    color: #444443;
+}
+
+.entry-title {
+    margin: 0.67em 0;
+    margin-top: 0;
+    font-size: 2em;
+}
