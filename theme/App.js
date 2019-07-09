@@ -1,22 +1,16 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 
-import Home from './pages/Home';
-import Detail from './pages/Detail';
-import About from './pages/About';
+import Footer from './components/Footer';
+
 import Blogs from './pages/Blogs';
 import BlogDetail from './pages/BlogDetail';
 
-import './App.css';
-
 function App({ imports, source }) {
   return (
-    <Router>
-      <div>
+    <div>
+      <Router>
         <Switch>
-          <Route path="/" exact render={(props) => {
-            return <Home {...props} source={source} imports={imports} />;
-          }} />
           <Route path="/blog/:id" render={(props) => {
             return (
               <BlogDetail
@@ -29,9 +23,11 @@ function App({ imports, source }) {
           <Route path="/blog" exact render={(props) => {
             return <Blogs {...props} source={source} imports={imports} />;
           }} />
+          <Redirect from="/" to="/blog" />
         </Switch>
-      </div>
-    </Router>
+      </Router>
+      <Footer />
+    </div>
   );
 }
 

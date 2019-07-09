@@ -1,5 +1,6 @@
 ---
 title: fake-bisheng 开发说明
+publishDate: 2019-07-01
 ---
 
 `fake-bisheng` 是在 `bisheng` 和 `docz` 的启发下，想要开发出一个框架无关的，更加自由的组件展示站搭建工具。

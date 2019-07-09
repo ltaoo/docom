@@ -1,5 +1,6 @@
 ---
 title: 使用 fake-bisheng 搭建博客
+publishDate: 2019-07-02
 ---
 
 `fake-bisheng` 不仅可以用来搭建组件展示站，还可以用作个人博客，只需要简单配置就可直接生成博客。

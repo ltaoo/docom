@@ -1,0 +1,32 @@
+.header {
+    font-size: 16px;
+    font-family: "Optima", "Avenir", "Helvetica Neue", sans-serif;
+    padding: 20px 10px;
+
+}
+
+.header__container {
+    max-width: 640px;
+    margin: 0 auto;
+    zoom: 1;
+}
+
+.header__contaner::after {
+    content: " ";
+    display: block;
+    clear: both;
+}
+
+.header__brand {
+    float: left;
+    margin-right: 30px;
+    text-transform: uppercase;
+}
+.header__brand::before {
+    content: '\BB';
+}
+
+.header__link {
+    color: #323233;
+    text-decoration: none;
+}
