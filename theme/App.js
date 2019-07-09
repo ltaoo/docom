@@ -6,8 +6,6 @@ import Footer from './components/Footer';
 import Blogs from './pages/Blogs';
 import BlogDetail from './pages/BlogDetail';
 
-import './App.css';
-
 function App({ imports, source }) {
   return (
     <div>
