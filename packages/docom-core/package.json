@@ -2,6 +2,9 @@
   "name": "docom-core",
   "version": "0.1.0",
   "private": true,
+  "bin": {
+    "docom": "./scripts/start.js"
+  },
   "dependencies": {
     "@babel/core": "7.4.3",
     "@svgr/webpack": "4.1.0",

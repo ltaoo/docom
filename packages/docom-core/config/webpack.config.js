@@ -272,7 +272,9 @@ module.exports = function(webpackEnv) {
         // Support React Native Web
         // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
         '@root': paths.appPath,
+        '@theme': paths.theme,
         'react-native': 'react-native-web',
+        'react': path.join(paths.entryModule, 'node_modules/react'),
       },
       plugins: [
         // Adds support for installing with Plug'n'Play, leading to faster installs and adding
@@ -336,13 +338,17 @@ module.exports = function(webpackEnv) {
             // The preset includes JSX, Flow, TypeScript, and some ESnext features.
             {
               test: /\.(js|mjs|jsx|ts|tsx)$/,
-              include: paths.appSrc,
+              // include: [paths.appNodeModules, paths.appSrc],
+              // include: './',
               loader: require.resolve('babel-loader'),
               options: {
                 customize: require.resolve(
                   'babel-preset-react-app/webpack-overrides'
                 ),
-                
+                presets: [
+                  ['@babel/preset-react'],
+                  ['@babel/preset-env'],
+                ],
                 plugins: [
                   [
                     require.resolve('babel-plugin-named-asset-import'),
@@ -358,7 +364,7 @@ module.exports = function(webpackEnv) {
                 // This is a feature of `babel-loader` for webpack (not Babel itself).
                 // It enables caching results in ./node_modules/.cache/babel-loader/
                 // directory for faster rebuilds.
-                cacheDirectory: true,
+                // cacheDirectory: true,
                 cacheCompression: isEnvProduction,
                 compact: isEnvProduction,
               },
@@ -370,15 +376,15 @@ module.exports = function(webpackEnv) {
               exclude: /@babel(?:\/|\\{1,2})runtime/,
               loader: require.resolve('babel-loader'),
               options: {
-                babelrc: false,
+                babelrc: true,
                 configFile: false,
                 compact: false,
-                presets: [
-                  [
-                    require.resolve('babel-preset-react-app/dependencies'),
-                    { helpers: true },
-                  ],
-                ],
+                // presets: [
+                //   [
+                //     require.resolve('babel-preset-react-app/dependencies'),
+                //     { helpers: true },
+                //   ],
+                // ],
                 cacheDirectory: true,
                 cacheCompression: isEnvProduction,
                 

@@ -2,9 +2,20 @@ const path = require('path');
 const fs = require('fs');
 const url = require('url');
 
+const projectRoot = process.cwd();
+const projectNodeModulesPath = path.resolve(projectRoot, 'node_modules');
+const DOCOM_CORE = 'docom-core';
+const ENTRY_TYPE = 'docom-entry-react';
+const entryModulePath = path.resolve(projectNodeModulesPath, ENTRY_TYPE);
+const entryIndex = path.resolve(entryModulePath, 'index.jsx');
+const theme = 'docom-theme-one';
+const themePath = path.resolve(projectNodeModulesPath, theme);
+
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebook/create-react-app/issues/637
-const bishengDirectory = fs.realpathSync(path.join(process.cwd(), './core'));
+const bishengDirectory = fs.realpathSync(
+  path.join(projectNodeModulesPath, DOCOM_CORE)
+);
 const resolveBishengApp = relativePath => path.resolve(bishengDirectory, relativePath);
 const appDirectory = fs.realpathSync(process.cwd());
 const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
@@ -68,13 +79,16 @@ const resolveModule = (resolveFn, filePath) => {
 // config after eject: we're in ./config/
 module.exports = {
   dotenv: resolveApp('.env'),
-  appPath: resolveApp('.'),
+  theme: themePath,
+  appPath: projectRoot,
   appBuild: resolveBishengApp('build'),
   appPublic: resolveBishengApp('public'),
   appHtml: resolveBishengApp('public/index.html'),
-  appIndexJs: resolveModule(resolveApp, 'entries/index'),
+  // appIndexJs: resolveModule(resolveApp, 'entries/index'),
+  entryModule: entryModulePath,
+  appIndexJs: entryIndex,
   appPackageJson: resolveApp('package.json'),
-  appSrc: resolveApp('.'),
+  appSrc: projectRoot,
   appTsConfig: resolveApp('tsconfig.json'),
   appJsConfig: resolveApp('jsconfig.json'),
   yarnLockFile: resolveApp('yarn.lock'),
