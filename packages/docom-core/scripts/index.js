@@ -11,6 +11,7 @@ Object.defineProperty(global, 'docom', {
 });
 
 const dev = require('./start');
+const build = require('./build');
 
 module.exports = {
     cli: () => {
@@ -19,6 +20,18 @@ module.exports = {
                 'dev', 'initialize docom dev server', (yargs) => {
             }, (argv) => {
                 dev();
+            })
+            .option('config', {
+                alias: 'c',
+            })
+            .option('verbose', {
+                alias: 'v',
+                default: false,
+            })
+            .command(
+                'build', 'bundle', (yargs) => {
+            }, (argv) => {
+                build();
             })
             .option('config', {
                 alias: 'c',
