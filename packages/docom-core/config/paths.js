@@ -91,10 +91,7 @@ const resolveModule = (resolveFn, filePath) => {
   return resolveFn(`${filePath}.js`);
 };
 
-let init = false;
-
 module.exports = ({ from }) => {
-  console.log(from, docom.config);
   const basePaths = {
     appPath: projectRoot,
     dotenv: resolveProject('.env'),
@@ -126,7 +123,6 @@ module.exports = ({ from }) => {
   const entryModulePath = path.resolve(projectNodeModulesPath, entryModule);
   const entryIndex = path.resolve(entryModulePath, ENTRY_INDEX_DEFAULTL_FILE_NAME);
   const themePath = path.resolve(projectNodeModulesPath, mergedConfig.theme);
-  console.log(from, docom.config, themePath);
   return Object.assign(basePaths, {
     theme: themePath,
     entryModule: entryModulePath,

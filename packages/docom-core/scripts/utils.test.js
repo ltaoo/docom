@@ -21,29 +21,68 @@ describe('utils', () => {
                     key: 'develop',
                     title: '开发文档',
                     path: './docs/develop',
-                    absolutePath: '/Users/ltaoo/Documents/fake-bisheng/docs/develop',
+                    absolutePath: '/Users/ltaoo/Documents/fake-bisheng/packages/docom-core/docs/develop',
                 },
             ],
         })
     });
 
-    it('filesToTreeStructure', () => {
-        const files = [
-            'docs/develop/index.md',
-            'docs/develop/test.md',
-            'docs/develop/branch.md',
-        ];
-        const sources = ['./docs/develop'];
+    describe('filesToTreeStructure', () => {
+        it('one level dirs', () => {
+            const files = [
+                'docs/develop/index.md',
+                'docs/develop/test.md',
+                'docs/develop/branch.md',
+            ];
+            const sources = ['./docs/develop'];
 
-        const result = utils.filesToTreeStructure(files, sources);
-        expect(result).toEqual({
-            docs: {
-                develop: {
-                    index: 'docs/develop/index.md',
-                    test: 'docs/develop/test.md',
-                    branch: 'docs/develop/branch.md',
+            const result = utils.filesToTreeStructure(files, sources);
+            expect(result).toEqual({
+                docs: {
+                    develop: {
+                        index: 'docs/develop/index.md',
+                        test: 'docs/develop/test.md',
+                        branch: 'docs/develop/branch.md',
+                    },
                 },
-            },
+            });
+        });
+        it('rec dirs', () => {
+            const files = [
+                'docs/develop/index.md',
+                'docs/develop/test.md',
+                'docs/develop/branch.md',
+                'src/components/index.md',
+                'src/components/button/index.md',
+                'src/components/button/demo/index.md',
+                'src/components/input/index.md',
+            ];
+            const sources = ['./docs/develop', './src/components'];
+
+            const result = utils.filesToTreeStructure(files, sources);
+            expect(result).toEqual({
+                docs: {
+                    develop: {
+                        index: 'docs/develop/index.md',
+                        test: 'docs/develop/test.md',
+                        branch: 'docs/develop/branch.md',
+                    },
+                },
+                src: {
+                    components: {
+                        index: 'src/components/index.md',
+                        button: {
+                            index: 'src/components/button/index.md',
+                            demo: {
+                                index: 'src/components/button/demo/index.md',
+                            },
+                        },
+                        input: {
+                            index: 'src/components/input/index.md',
+                        },
+                    },
+                },
+            });
         });
     });
 
@@ -127,5 +166,27 @@ describe('utils', () => {
         const result = utils.createImportsContent(modules);
 
         expect(result).toEqual(expectResult);
+    });
+
+    it('normalizeFilePath', () => {
+        const config = {
+            files: ['**/*.md'],
+            modules: {
+                develop: {
+                    title: '开发文档',
+                    path: './docs/develop',
+                },
+                components: {
+                    title: '組件',
+                    path: './src/components',
+                }, 
+            },
+        };
+        const filename = 'src/components/index.md';
+
+        const formatedConfig = utils.format(config);
+        const result = utils.normalizeFilePath(filename, formatedConfig.modules);
+
+        expect(result).toBe('components/index.md');
     });
 });

@@ -125,36 +125,40 @@ function filesToTreeStructure(filenames, sources) {
   }, {});
 }
 
+/**
+ * 递归处理 md 文件路径
+ * @param {FileTree} fileTree
+ */
 function processRelativePath(fileTree) {
-  return (action) => {
-    return Object.keys(fileTree)
-      .map(moduleName => {
-        const module = fileTree[moduleName];
+  function foo(tree, callback, file) {
+    if (typeof tree === 'string') {
+      return callback(tree, file);
+    }
+    return Object.keys(tree)
+      .map(key => {
+        const module = tree[key];
         return {
-          [moduleName]: Object.keys(module)
-            .map(fileName => {
-              const relativePath = module[fileName];
-              return {
-                [fileName]: action(relativePath, fileName)
-              };
-            })
-            .reduce((files, addedRootAliasPath) => {
-              return {
-                ...files,
-                ...addedRootAliasPath,
-              };
-            }, {}),
-          };
+          [key]: foo(module, callback, key),
+        };
       })
-      .reduce((a, b) => {
+      .reduce((files, pathname) => {
         return {
-          ...a,
-          ...b,
+          ...files,
+          ...pathname,
         };
       }, {});
+  }
+  return (action) => {
+    return foo(fileTree, action);
   };
 }
 
+/**
+ * 给路径增加前缀
+ * @param {FileTree} fileTree 
+ * @param {string} prefix 
+ * @return {FileTree}
+ */
 function addRootAlias(fileTree, prefix) {
   return processRelativePath(fileTree)((relativePath) => {
     return prefix + relativePath;
@@ -196,11 +200,35 @@ function createImportsFile(fileTree) {
   });
 }
 
-function createSourceFile(fileTree) {
+function removePrefixPath(pathname) {
+  return pathname.replace(/^\.\//g, '');
+}
+
+/**
+ * 
+ * @param {string} filepath 
+ * @param {Array<string>} sources 
+ */
+function normalizeFilePath(filepath, sources) {
+  const source = sources.find(source => {
+    // @TODO 可能有平台差异
+    const pathname = removePrefixPath(source.path);
+    return filepath.indexOf(pathname) > -1;
+  });
+  if (source === undefined) {
+    return filepath;
+  }
+  return filepath.replace(removePrefixPath(source.path), source.key);
+}
+
+function createSourceFile(fileTree, config) {
   const content = processRelativePath(fileTree)((relativePath, fileName) => {
     const absolutePath = path.resolve(process.cwd(), relativePath);
     // 在这里解析完返回？
-    return marktwain(fs.readFileSync(absolutePath, 'utf-8'));
+    const mdContent = marktwain(fs.readFileSync(absolutePath, 'utf-8'));
+    mdContent.meta.realpath = relativePath;
+    mdContent.meta.filename = normalizeFilePath(relativePath, config.modules);
+    return mdContent;
   });
   fs.mkdir(path.resolve(process.cwd(), '.docom'), (err) => {
     touch(path.resolve(process.cwd(), '.docom/source.json'), JSON.stringify(content));
@@ -218,4 +246,5 @@ module.exports = {
   addPlaceholder,
   createImportsContent,
   createSourceFile,
+  normalizeFilePath,
 };

@@ -48,7 +48,7 @@ module.exports = () => {
   const { hooks: themeHooks } = themeConfig;
   const hooks = themeHooks;
   const fileTree = getFileTree(formattedConfig.modules, formattedConfig.files);
-  createSourceFile(fileTree);
+  createSourceFile(fileTree, formattedConfig);
   createImportsFile(fileTree);
   const useYarn = fs.existsSync(paths.yarnLockFile);
   const isInteractive = process.stdout.isTTY;
@@ -98,7 +98,6 @@ module.exports = () => {
       if (hooks.beforeCompile) {
         hooks.beforeCompile(config);
       }
-      console.log(config);
       const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
       const appName = require(paths.appPackageJson).name;
       const useTypeScript = fs.existsSync(paths.appTsConfig);
