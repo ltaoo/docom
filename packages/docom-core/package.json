@@ -1,7 +1,6 @@
 {
   "name": "docom-core",
   "version": "0.1.0",
-  "private": true,
   "bin": {
     "docom": "./bin/index.js"
   },
