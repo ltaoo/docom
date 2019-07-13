@@ -1,8 +1,6 @@
-
-
 const fs = require('fs');
-const isWsl = require('is-wsl');
 const path = require('path');
+const isWsl = require('is-wsl');
 const webpack = require('webpack');
 const resolve = require('resolve');
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
@@ -19,12 +17,15 @@ const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent');
-const getPaths = require('./paths');
-const modules = require('./modules');
-const getClientEnvironment = require('./env');
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
+
+const presetEnv = require('@babel/preset-env');
+
+const getPaths = require('./paths');
+const modules = require('./modules');
+const getClientEnvironment = require('./env');
 
 const postcssNormalize = require('postcss-normalize');
 
@@ -257,7 +258,7 @@ module.exports = function(webpackEnv) {
       // We placed these paths second because we want `node_modules` to "win"
       // if there are any conflicts. This matches Node resolution mechanism.
       // https://github.com/facebook/create-react-app/issues/253
-      modules: ['node_modules', paths.appNodeModules].concat(
+      modules: ['node_modules', paths.docomCoreNodeModules].concat(
         modules.additionalModulePaths || []
       ),
       // These are the reasonable defaults supported by the Node ecosystem.
@@ -280,20 +281,20 @@ module.exports = function(webpackEnv) {
       plugins: [
         // Adds support for installing with Plug'n'Play, leading to faster installs and adding
         // guards against forgotten dependencies and such.
-        PnpWebpackPlugin,
+        // PnpWebpackPlugin,
         // Prevents users from importing files from outside of src/ (or node_modules/).
         // This often causes confusion because we only process files within src/ with babel.
         // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
         // please link the files into your node_modules/ and let module-resolution kick in.
         // Make sure your source files are compiled, as they will not be processed in any way.
-        new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson]),
+        // new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson]),
       ],
     },
     resolveLoader: {
       plugins: [
         // Also related to Plug'n'Play, but this time it tells Webpack to load its loaders
         // from the current package.
-        PnpWebpackPlugin.moduleLoader(module),
+        // PnpWebpackPlugin.moduleLoader(module),
       ],
     },
     module: {
@@ -339,16 +340,19 @@ module.exports = function(webpackEnv) {
             // The preset includes JSX, Flow, TypeScript, and some ESnext features.
             {
               test: /\.(js|mjs|jsx|ts|tsx)$/,
-              // include: [paths.appNodeModules, paths.appSrc],
-              // include: './',
               loader: require.resolve('babel-loader'),
+              include: [
+                // 这里必须要真实路径，开发时需要，但生产是不需要的
+                fs.realpathSync(paths.entryModule),
+                fs.realpathSync(paths.theme),
+              ],
               options: {
                 customize: require.resolve(
                   'babel-preset-react-app/webpack-overrides'
                 ),
                 presets: [
-                  ['@babel/preset-react'],
-                  ['@babel/preset-env'],
+                  [require.resolve('@babel/preset-react')],
+                  [require.resolve('@babel/preset-env')],
                 ],
                 plugins: [
                   [
@@ -372,30 +376,30 @@ module.exports = function(webpackEnv) {
             },
             // Process any JS outside of the app with Babel.
             // Unlike the application JS, we only compile the standard ES features.
-            {
-              test: /\.(js|mjs)$/,
-              exclude: /@babel(?:\/|\\{1,2})runtime/,
-              loader: require.resolve('babel-loader'),
-              options: {
-                babelrc: true,
-                configFile: false,
-                compact: false,
-                // presets: [
-                //   [
-                //     require.resolve('babel-preset-react-app/dependencies'),
-                //     { helpers: true },
-                //   ],
-                // ],
-                cacheDirectory: true,
-                cacheCompression: isEnvProduction,
+            // {
+            //   test: /\.(js|mjs)$/,
+            //   exclude: /@babel(?:\/|\\{1,2})runtime/,
+            //   loader: require.resolve('babel-loader'),
+            //   options: {
+            //     babelrc: true,
+            //     configFile: false,
+            //     compact: false,
+            //     // presets: [
+            //     //   [
+            //     //     require.resolve('babel-preset-react-app/dependencies'),
+            //     //     { helpers: true },
+            //     //   ],
+            //     // ],
+            //     cacheDirectory: true,
+            //     cacheCompression: isEnvProduction,
                 
-                // If an error happens in a package, it's possible to be
-                // because it was compiled. Thus, we don't want the browser
-                // debugger to show the original code. Instead, the code
-                // being evaluated would be much more helpful.
-                sourceMaps: false,
-              },
-            },
+            //     // If an error happens in a package, it's possible to be
+            //     // because it was compiled. Thus, we don't want the browser
+            //     // debugger to show the original code. Instead, the code
+            //     // being evaluated would be much more helpful.
+            //     sourceMaps: false,
+            //   },
+            // },
             // "postcss" loader applies autoprefixer to our CSS.
             // "css" loader resolves paths in CSS and adds assets as dependencies.
             // "style" loader turns CSS into JS modules that inject <style> tags.

@@ -1,3 +1,15 @@
+/**
+ * @file 資源定位
+ * 要明確需要的依賴到底在哪裡
+ * - projectRoot
+ *    - node_modules
+ *        - docom-core
+ *        - docom-theme-one
+ *        - docom-entry-react
+ *        - docom-xx
+ * 以及，要知道 webpack 是怎麼尋找依賴的
+ * 通過 alias，可以簡單處理 theme 和 imports 的定位
+ */
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
@@ -14,16 +26,14 @@ const NODE_MODULES = 'node_modules';
 const ENTRY_PREFIX = 'docom-entry-';
 const ENTRY_INDEX_DEFAULTL_FILE_NAME = 'index.js';
 
-const projectRoot = process.cwd();
+// 執行命令行的目錄，一般都是自己的項目根目錄
+const projectRoot = fs.realpathSync(process.cwd());
 const projectNodeModulesPath = path.resolve(projectRoot, NODE_MODULES);
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebook/create-react-app/issues/637
-const bishengDirectory = fs.realpathSync(
-  path.join(projectNodeModulesPath, DOCOM_CORE_MODULE)
-);
-const resolveBishengApp = relativePath => path.resolve(bishengDirectory, relativePath);
-const appDirectory = fs.realpathSync(process.cwd());
-const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
+const docomCoreModulePath = fs.realpathSync(path.join(projectNodeModulesPath, DOCOM_CORE_MODULE));
+const resolveCore = relativePath => path.resolve(docomCoreModulePath, relativePath);
+const resolveProject = relativePath => path.resolve(projectRoot, relativePath);
 
 const envPublicUrl = process.env.PUBLIC_URL;
 
@@ -82,33 +92,37 @@ const resolveModule = (resolveFn, filePath) => {
 };
 
 module.exports = ({ from }) => {
-  console.log(from, docom.config);
   const mergedConfig = Object.assign({}, DEFAULT_CONFIG, docom.config);
+  docom.config = mergedConfig;
 
   const entryModule = ENTRY_PREFIX + mergedConfig.entryType;
   const entryModulePath = path.resolve(projectNodeModulesPath, entryModule);
   const entryIndex = path.resolve(entryModulePath, ENTRY_INDEX_DEFAULTL_FILE_NAME);
   const themePath = path.resolve(projectNodeModulesPath, mergedConfig.theme);
-  console.log(themePath);
+
   return {
-    dotenv: resolveApp('.env'),
+    dotenv: resolveProject('.env'),
     theme: themePath,
     appPath: projectRoot,
-    appBuild: resolveBishengApp('build'),
-    appPublic: resolveBishengApp('public'),
-    appHtml: resolveBishengApp('public/index.html'),
+    appBuild: resolveProject('_docom'),
+    appPublic: resolveCore('public'),
+    appHtml: resolveCore('public/index.html'),
     entryModule: entryModulePath,
     appIndexJs: entryIndex,
-    appPackageJson: resolveApp('package.json'),
+    appPackageJson: resolveProject('package.json'),
     appSrc: projectRoot,
-    appTsConfig: resolveApp('tsconfig.json'),
-    appJsConfig: resolveApp('jsconfig.json'),
-    yarnLockFile: resolveApp('yarn.lock'),
-    testsSetup: resolveModule(resolveApp, 'src/setupTests'),
-    proxySetup: resolveApp('src/setupProxy.js'),
-    appNodeModules: resolveApp('node_modules'),
-    publicUrl: getPublicUrl(resolveApp('package.json')),
-    servedPath: getServedPath(resolveApp('package.json')),
+    appTsConfig: resolveProject('tsconfig.json'),
+    appJsConfig: resolveProject('jsconfig.json'),
+    yarnLockFile: resolveProject('yarn.lock'),
+    testsSetup: resolveModule(resolveProject, 'src/setupTests'),
+    proxySetup: resolveProject('src/setupProxy.js'),
+    // node_modules
+    docomCoreNodeModules: resolveCore(NODE_MODULES),
+    appNodeModules: path.resolve(DOCOM_CORE_MODULE, NODE_MODULES),
+    
+    babelrc: resolveCore('.babelrc'),
+    publicUrl: getPublicUrl(resolveProject('package.json')),
+    servedPath: getServedPath(resolveProject('package.json')),
     moduleFileExtensions: moduleFileExtensions,
   };
 };
