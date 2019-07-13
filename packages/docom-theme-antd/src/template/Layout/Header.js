@@ -112,18 +112,15 @@ export default class Header extends React.Component {
 
   render() {
     const { menuVisible } = this.state;
-    const { location, themeConfig } = this.props;
+    const { location, navs } = this.props;
 
     const menuMode = 'horizontal';
     const module = location.pathname
-      .replace(/(^\/|\/$)/g, '')
-      .split('/')
-      .slice(0, -1)
-      .join('/');
-    let activeMenuItem = module || 'home';
-    if (activeMenuItem === 'components' || location.pathname === 'changelog') {
-      activeMenuItem = 'docs/react';
-    }
+      .replace(/(^\/|\/$)/g, '');
+      // .split('/')
+      // .slice(0, -1)
+      // .join('/');
+    const activeMenuItem = module;
     const {
       intl: { locale },
     } = this.context;
@@ -134,15 +131,6 @@ export default class Header extends React.Component {
     });
 
     const menu = [
-      <Button
-        ghost
-        size="small"
-        onClick={this.handleLangChange}
-        className="header-lang-button"
-        key="lang-button"
-      >
-        <FormattedMessage id="app.header.lang" />
-      </Button>,
       <Menu
         className="menu-site"
         mode={menuMode}
@@ -150,21 +138,15 @@ export default class Header extends React.Component {
         id="nav"
         key="nav"
       >
-        {/* <Menu.Item key="home" className="hide-in-home-page">
-          <Link to={utils.getLocalizedPathname('/', isZhCN)}>
-            <FormattedMessage id="app.header.menu.home" />
-          </Link>
-        </Menu.Item> */}
-        {/* <Menu.Item key="docs/spec">
-          <Link to={utils.getLocalizedPathname('/docs/spec/introduce', isZhCN)}>
-            <FormattedMessage id="app.header.menu.spec" />
-          </Link>
-        </Menu.Item> */}
-        {/* <Menu.Item key="docs/react">
-          <Link to={utils.getLocalizedPathname('/docs/react/introduce', isZhCN)}>
-            <FormattedMessage id="app.header.menu.components" />
-          </Link>
-        </Menu.Item> */}
+        {
+          navs.map(nav => (
+            <Menu.Item key={nav.pathname} className="hide-in-home-page">
+              <Link to={utils.getLocalizedPathname(nav.pathname, isZhCN)}>
+                {nav.title}
+              </Link>
+            </Menu.Item>
+          ))
+        }
       </Menu>,
     ];
 

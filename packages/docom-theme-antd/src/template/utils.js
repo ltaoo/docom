@@ -19,7 +19,6 @@
 export function getMenuItems(moduleData, locale, categoryOrder, typeOrder) {
   const menuMeta = moduleData.map(item => ({
     ...item.meta,
-    filename: item.meta.menuFilename,
   }));
   const menuItems = [];
   const sortFn = (a, b) => (a.order || 0) - (b.order || 0);

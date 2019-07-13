@@ -1,4 +1,33 @@
 module.exports = {
+    categoryOrder: {
+        'Ant Design': 0,
+        原则: 1,
+        Principles: 1,
+        视觉: 2,
+        Visual: 2,
+        模式: 3,
+        Patterns: 3,
+        其他: 6,
+        Other: 6,
+        Components: 100,
+    },
+    // 控制左侧菜单
+    typeOrder: {
+        General: 0,
+        Layout: 1,
+        Navigation: 2,
+        'Data Entry': 3,
+        'Data Display': 4,
+        Feedback: 5,
+        Other: 6,
+        通用: 0,
+        布局: 1,
+        导航: 2,
+        数据录入: 3,
+        数据展示: 4,
+        反馈: 5,
+        其他: 6,
+    },
     hooks: {
         beforeCompile(webpackConfig) {
             webpackConfig.module.rules = webpackConfig.module.rules.map(rule => {

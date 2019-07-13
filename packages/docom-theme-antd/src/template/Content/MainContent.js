@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Row, Col, Menu, Icon, Affix } from 'antd';
 import classNames from 'classnames';
+import * as R from 'ramda';
 import get from 'lodash/get';
 
 import Article from './Article';
@@ -13,14 +14,26 @@ import * as utils from '../utils';
 
 const { SubMenu } = Menu;
 
+/**
+ * 获取侧边栏选中状态的菜单
+ * @param {Props} props
+ * @return 
+ */
 function getActiveMenuItem(props) {
-  const { children } = props.params;
+  const { params: { children } = {} } = props;
   return (
-    (children && children.replace('-cn', '')) || props.location.pathname.replace(/(^\/|-cn$)/g, '')
+    (children && children.replace('-cn', ''))
+    || props.location.pathname.replace(/(^\/|-cn$)/g, '')
   );
 }
 
+/**
+ * 获取模块数据
+ * @param {Props} props
+ * @return {Array<ModuleItem>}
+ */
 function getModuleData(props) {
+  const { source } = props;
   const { pathname } = props.location;
   const moduleName = /^\/?components/.test(pathname)
     ? 'components'
@@ -29,28 +42,33 @@ function getModuleData(props) {
         .filter(item => item)
         .slice(0, 2)
         .join('/');
-  const moduleData =
-    moduleName === 'components' ||
-    moduleName === 'docs/react'
-    // moduleName === 'changelog' ||
-    // moduleName === 'changelog-cn'
-      ? [
-        ...props.picked.components, 
-        // ...props.picked['docs/react'], 
-        // ...props.picked.changelog
-      ]
-      : props.picked[moduleName];
-  const excludedSuffix = utils.isZhCN(props.location.pathname) ? 'en-US.md' : 'zh-CN.md';
-  return moduleData.filter(({ meta }) => !meta.filename.endsWith(excludedSuffix));
+  const moduleData = Object.keys(source[moduleName]).map(item => {
+    const data = source[moduleName][item];
+    if (data.meta) {
+      return data;
+    }
+    return data.index;
+  });
+  return moduleData;
 }
 
+/**
+ * 将文件名转换成路径
+ * @param {string} filename 
+ * @return {string}
+ */
 function fileNameToPath(filename) {
   const snippets = filename.replace(/(\/index)?((\.zh-CN)|(\.en-US))?\.md$/i, '').split('/');
   return snippets[snippets.length - 1];
 }
 
+/**
+ * 获取侧边栏展开状态的菜单
+ * @param {Props} nextProps
+ * @return {Array<string>}
+ */
 const getSideBarOpenKeys = nextProps => {
-  const { themeConfig } = nextProps;
+  const { themeConfig = {} } = nextProps;
   const { pathname } = nextProps.location;
   const locale = utils.isZhCN(pathname) ? 'zh-CN' : 'en-US';
   const moduleData = getModuleData(nextProps);
@@ -64,8 +82,35 @@ export default class MainContent extends Component {
   constructor(props) {
     super(props);
 
+    const { location: { pathname }, imports } = props;
+    let paths = pathname.split('/').filter(Boolean);
+    let c = R.path(paths, imports);
+    if (typeof c === 'object') {
+      paths = paths.concat('index');
+      c = R.path(paths, imports);
+    }
+    c()
+      .then((response) => {
+        console.log(response);
+        this.setState({
+            meta: response.meta,
+            content: response.content,
+        });
+      })
+      .catch((err) => {
+          console.log(err);
+      })
+      .finally(() => {
+          this.setState({
+              loading: false,
+          });
+      });
+  
     this.state = {
-      openKeys: undefined,
+        openKeys: undefined,
+        loading: true,
+        content: [],
+        pathname,
     };
   }
 
@@ -114,8 +159,12 @@ export default class MainContent extends Component {
     this.scroller.disable();
   }
 
+  /**
+   * 生成侧边菜单
+   * @param {*} footerNavIcons 
+   */
   getMenuItems(footerNavIcons = {}) {
-    const { themeConfig } = this.props;
+    const { locale, themeConfig = {} } = this.props;
     const moduleData = getModuleData(this.props);
     const menuItems = utils.getMenuItems(
       moduleData,
@@ -186,6 +235,15 @@ export default class MainContent extends Component {
       });
   }
 
+  /**
+   * 生成菜单 react element
+   * @param {boolean} isTop 
+   * @param {ModuleItem} item 
+   * @param {Object} param
+   * @param {boolean | null} param.before
+   * @param {boolean | null} param.after
+   * @return {ReactElement}
+   */
   generateMenuItem(isTop, item, { before = null, after = null }) {
     const {
       intl: { locale },
@@ -253,7 +311,10 @@ export default class MainContent extends Component {
 
   render() {
     const { props } = this;
-    const { openKeys } = this.state;
+    const { loading, openKeys, meta, content } = this.state;
+    if (loading) {
+      return <p>Loading</p>;
+    }
     const activeMenuItem = getActiveMenuItem(props);
     const menuItems = this.getMenuItems();
     const menuItemsForFooterNav = this.getMenuItems({
@@ -265,6 +326,7 @@ export default class MainContent extends Component {
     const mainContainerClass = classNames('main-container', {
       'main-container-component': !!props.demos,
     });
+
     const menuChild = (
       <Menu
         inlineIndent="40"
@@ -287,14 +349,9 @@ export default class MainContent extends Component {
           </Col>
           <Col xxl={20} xl={19} lg={18} md={24} sm={24} xs={24}>
             <section className={mainContainerClass}>
-              {props.demos ? (
-                <ComponentDoc {...props} doc={localizedPageData} demos={props.demos} />
-              ) : (
-                <Article {...props} content={localizedPageData} />
-              )}
+              <Article {...props} content={content} meta={meta} />
             </section>
             <PrevAndNext prev={prev} next={next} />
-            {/* <Footer /> */}
           </Col>
         </Row>
       </div>

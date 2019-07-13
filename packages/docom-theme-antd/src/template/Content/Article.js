@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import DocumentTitle from 'react-document-title';
 import { getChildren } from 'jsonml.js/lib/utils';
 import { Timeline, Alert, Affix } from 'antd';
+import toReactComponent from 'jsonml-to-react-element';
 // import EditButton from './EditButton';
 
 export default class Article extends React.Component {
@@ -34,8 +35,7 @@ export default class Article extends React.Component {
   };
 
   getArticle(article) {
-    const { content } = this.props;
-    const { meta } = content;
+    const { content, meta } = this.props;
     if (!meta.timeline) {
       return article;
     }
@@ -59,16 +59,14 @@ export default class Article extends React.Component {
   }
 
   render() {
-    const { props } = this;
-    const { content } = props;
-    const { meta, description } = content;
+    const { meta, content, description } = this.props;
     const { title, subtitle, filename } = meta;
     const {
       intl: { locale },
     } = this.context;
     const isNotTranslated = locale === 'en-US' && typeof title === 'object';
     return (
-      <DocumentTitle title={`${title[locale] || title} - Ant Design`}>
+      <DocumentTitle title={`${title} - Ant Design`}>
         {/* eslint-disable-next-line */}
         <article className="markdown" onClick={this.onResourceClick}>
           {isNotTranslated && (
@@ -94,22 +92,22 @@ export default class Article extends React.Component {
           </h1>
           {!description
             ? null
-            : props.utils.toReactComponent(
+            : toReactComponent(
                 ['section', { className: 'markdown' }].concat(getChildren(description)),
               )}
           {!content.toc || content.toc.length <= 1 || meta.toc === false ? null : (
             <Affix className="toc-affix" offsetTop={16}>
-              {props.utils.toReactComponent(
+              {toReactComponent(
                 ['ul', { className: 'toc' }].concat(getChildren(content.toc)),
               )}
             </Affix>
           )}
           {this.getArticle(
-            props.utils.toReactComponent(
-              ['section', { className: 'markdown' }].concat(getChildren(content.content)),
+            toReactComponent(
+              ['section', { className: 'markdown' }].concat(getChildren(content)),
             ),
           )}
-          {props.utils.toReactComponent(
+          {toReactComponent(
             [
               'section',
               {

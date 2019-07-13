@@ -12,7 +12,7 @@ export default class App extends React.Component {
                     <Route
                         path="/"
                         render={(props) => {
-                            return <Layout {...props} />;
+                            return <Layout {...props} {...this.props} />;
                         }}
                     />
                 </Switch>
