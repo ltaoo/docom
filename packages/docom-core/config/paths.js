@@ -17,7 +17,7 @@ const url = require('url');
 const DEFAULT_ENTRY_TYPE = 'react';
 const DEFAULT_THEME = 'docom-theme-one';
 const DEFAULT_CONFIG = {
-  theme: DEFAULT_THEME,
+  // theme: DEFAULT_THEME,
   entryType: DEFAULT_ENTRY_TYPE,
 };
 
@@ -91,7 +91,34 @@ const resolveModule = (resolveFn, filePath) => {
   return resolveFn(`${filePath}.js`);
 };
 
+let init = false;
+
 module.exports = ({ from }) => {
+  console.log(from, docom.config);
+  const basePaths = {
+    appPath: projectRoot,
+    dotenv: resolveProject('.env'),
+    appBuild: resolveProject('_docom'),
+    appPublic: resolveCore('public'),
+    appHtml: resolveCore('public/index.html'),
+    appPackageJson: resolveProject('package.json'),
+    appTsConfig: resolveProject('tsconfig.json'),
+    appJsConfig: resolveProject('jsconfig.json'),
+    yarnLockFile: resolveProject('yarn.lock'),
+    testsSetup: resolveModule(resolveProject, 'src/setupTests'),
+    proxySetup: resolveProject('src/setupProxy.js'),
+    babelrc: resolveCore('.babelrc'),
+    publicUrl: getPublicUrl(resolveProject('package.json')),
+    servedPath: getServedPath(resolveProject('package.json')),
+    // node_modules
+    docomCoreNodeModules: resolveCore(NODE_MODULES),
+    appNodeModules: path.resolve(DOCOM_CORE_MODULE, NODE_MODULES),
+    appSrc: projectRoot,
+    moduleFileExtensions: moduleFileExtensions,
+  };
+  if (Object.keys(docom.config).length === 0) {
+    return basePaths;
+  }
   const mergedConfig = Object.assign({}, DEFAULT_CONFIG, docom.config);
   docom.config = mergedConfig;
 
@@ -99,30 +126,10 @@ module.exports = ({ from }) => {
   const entryModulePath = path.resolve(projectNodeModulesPath, entryModule);
   const entryIndex = path.resolve(entryModulePath, ENTRY_INDEX_DEFAULTL_FILE_NAME);
   const themePath = path.resolve(projectNodeModulesPath, mergedConfig.theme);
-
-  return {
-    dotenv: resolveProject('.env'),
+  console.log(from, docom.config, themePath);
+  return Object.assign(basePaths, {
     theme: themePath,
-    appPath: projectRoot,
-    appBuild: resolveProject('_docom'),
-    appPublic: resolveCore('public'),
-    appHtml: resolveCore('public/index.html'),
     entryModule: entryModulePath,
     appIndexJs: entryIndex,
-    appPackageJson: resolveProject('package.json'),
-    appSrc: projectRoot,
-    appTsConfig: resolveProject('tsconfig.json'),
-    appJsConfig: resolveProject('jsconfig.json'),
-    yarnLockFile: resolveProject('yarn.lock'),
-    testsSetup: resolveModule(resolveProject, 'src/setupTests'),
-    proxySetup: resolveProject('src/setupProxy.js'),
-    // node_modules
-    docomCoreNodeModules: resolveCore(NODE_MODULES),
-    appNodeModules: path.resolve(DOCOM_CORE_MODULE, NODE_MODULES),
-    
-    babelrc: resolveCore('.babelrc'),
-    publicUrl: getPublicUrl(resolveProject('package.json')),
-    servedPath: getServedPath(resolveProject('package.json')),
-    moduleFileExtensions: moduleFileExtensions,
-  };
+  });
 };

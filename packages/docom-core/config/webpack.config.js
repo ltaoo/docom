@@ -24,7 +24,7 @@ const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const presetEnv = require('@babel/preset-env');
 
 const getPaths = require('./paths');
-const modules = require('./modules');
+// const modules = require('./modules');
 const getClientEnvironment = require('./env');
 
 const postcssNormalize = require('postcss-normalize');
@@ -258,9 +258,7 @@ module.exports = function(webpackEnv) {
       // We placed these paths second because we want `node_modules` to "win"
       // if there are any conflicts. This matches Node resolution mechanism.
       // https://github.com/facebook/create-react-app/issues/253
-      modules: ['node_modules', paths.docomCoreNodeModules].concat(
-        modules.additionalModulePaths || []
-      ),
+      modules: ['node_modules', paths.docomCoreNodeModules],
       // These are the reasonable defaults supported by the Node ecosystem.
       // We also include JSX as a common component filename extension to support
       // some tools, although we do not recommend using it, see:
@@ -276,7 +274,6 @@ module.exports = function(webpackEnv) {
         '@root': paths.appPath,
         '@theme': paths.theme,
         'react-native': 'react-native-web',
-        'react': path.join(paths.entryModule, 'node_modules/react'),
       },
       plugins: [
         // Adds support for installing with Plug'n'Play, leading to faster installs and adding
@@ -343,9 +340,9 @@ module.exports = function(webpackEnv) {
               loader: require.resolve('babel-loader'),
               include: [
                 // 这里必须要真实路径，开发时需要，但生产是不需要的
-                fs.realpathSync(paths.entryModule),
-                fs.realpathSync(paths.theme),
-              ],
+                paths.entryModule && fs.realpathSync(paths.entryModule),
+                paths.theme && fs.realpathSync(paths.theme),
+              ].filter(Boolean),
               options: {
                 customize: require.resolve(
                   'babel-preset-react-app/webpack-overrides'

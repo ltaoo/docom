@@ -9,7 +9,6 @@ process.on('unhandledRejection', err => {
   throw err;
 });
 
-// Ensure environment variables are read.
 require('../config/env');
 
 const fs = require('fs');
@@ -26,6 +25,7 @@ const {
   prepareUrls,
 } = require('react-dev-utils/WebpackDevServerUtils');
 const openBrowser = require('react-dev-utils/openBrowser');
+
 const getPaths = require('../config/paths');
 const configFactory = require('../config/webpack.config');
 const createDevServerConfig = require('../config/webpackDevServer.config');
@@ -39,6 +39,7 @@ const {
 } = require('./utils');
 
 module.exports = () => {
+  console.log('start', config);
   const formattedConfig = format(config);
   docom.config = formattedConfig;
   const paths = getPaths({ from: 'start' });

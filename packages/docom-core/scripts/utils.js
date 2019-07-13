@@ -33,7 +33,7 @@ const globConfig = {
   matchBase: true,
 };
 
-function collectFiles(module, files) {
+function collectFiles(module, files = ['**/*.md']) {
   const { path: modulePath } = module;
   const searchPath = path.resolve(modulePath);
   return glob.sync(files, { ...globConfig, cwd: searchPath });
