@@ -116,10 +116,9 @@ export default class Header extends React.Component {
 
     const menuMode = 'horizontal';
     const module = location.pathname
-      .replace(/(^\/|\/$)/g, '');
-      // .split('/')
-      // .slice(0, -1)
-      // .join('/');
+      .replace(/(^\/|\/$)/g, '')
+      .split('/')[0];
+    console.log(module);
     const activeMenuItem = module;
     const {
       intl: { locale },
@@ -141,7 +140,7 @@ export default class Header extends React.Component {
         {
           navs.map(nav => (
             <Menu.Item key={nav.pathname} className="hide-in-home-page">
-              <Link to={utils.getLocalizedPathname(nav.pathname, isZhCN)}>
+              <Link to={`/${nav.pathname}/index`}>
                 {nav.title}
               </Link>
             </Menu.Item>

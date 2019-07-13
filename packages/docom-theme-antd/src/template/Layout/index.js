@@ -44,9 +44,9 @@ export default class BasicLayout extends React.Component {
           <div className="page-wrapper">
             <Header navs={navs} {...restProps} />
             <Switch>
-              <Route path="/components/:children" render={(props) => {
-                console.log(props);
-                return <MainContent key={props.match.params.children} themeConfig={themeConfig} {...props} {...this.props} />;
+              <Route path="/:module" render={(props) => {
+                const { pathname } = props.location;
+                return <MainContent key={pathname} themeConfig={themeConfig} {...props} {...this.props} />;
               }} />
             </Switch>
           </div>

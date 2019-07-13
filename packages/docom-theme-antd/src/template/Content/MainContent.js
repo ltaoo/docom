@@ -20,11 +20,14 @@ const { SubMenu } = Menu;
  * @return 
  */
 function getActiveMenuItem(props) {
-  const { params: { children } = {} } = props;
-  return (
-    (children && children.replace('-cn', ''))
-    || props.location.pathname.replace(/(^\/|-cn$)/g, '')
-  );
+  const { location: { pathname } } = props;
+  return pathname;
+}
+
+function getModuleName(pathname) {
+ return pathname
+    .replace(/(^\/|\/$)/g, '')
+    .split('/')[0];
 }
 
 /**
@@ -35,13 +38,7 @@ function getActiveMenuItem(props) {
 function getModuleData(props) {
   const { source } = props;
   const { pathname } = props.location;
-  const moduleName = /^\/?components/.test(pathname)
-    ? 'components'
-    : pathname
-        .split('/')
-        .filter(item => item)
-        .slice(0, 2)
-        .join('/');
+  const moduleName = getModuleName(pathname);
   const moduleData = Object.keys(source[moduleName]).map(item => {
     const data = source[moduleName][item];
     if (data.meta) {
@@ -248,7 +245,7 @@ export default class MainContent extends Component {
     const {
       intl: { locale },
     } = this.context;
-    const key = fileNameToPath(item.filename);
+    const key = `/${item.filename.replace(/\.md/, '')}`;
     if (!item.title) {
       return null;
     }
@@ -262,13 +259,10 @@ export default class MainContent extends Component {
           </span>,
         ];
     const { disabled } = item;
-    const url = item.filename.replace(/(\/index)?((\.zh-CN)|(\.en-US))?\.md$/i, '').toLowerCase();
+    const url = `/${item.filename.replace(/\.md$/i, '').toLowerCase()}`;
     const child = !item.link ? (
       <Link
-        to={utils.getLocalizedPathname(
-          /^components/.test(url) ? `${url}/` : url,
-          locale === 'zh-CN',
-        )}
+        to={url}
         disabled={disabled}
       >
         {before}
@@ -288,7 +282,6 @@ export default class MainContent extends Component {
         {after}
       </a>
     );
-
     return (
       <Menu.Item key={key.toLowerCase()} disabled={disabled}>
         {child}
