@@ -1,4 +1,5 @@
 module.exports = {
+  // theme: 'docom-theme-antd',
   files: ['**/*.md'],
   modules: {
     blog: {
