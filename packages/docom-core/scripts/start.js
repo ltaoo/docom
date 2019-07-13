@@ -26,7 +26,7 @@ const {
   prepareUrls,
 } = require('react-dev-utils/WebpackDevServerUtils');
 const openBrowser = require('react-dev-utils/openBrowser');
-const paths = require('../config/paths');
+const getPaths = require('../config/paths');
 const configFactory = require('../config/webpack.config');
 const createDevServerConfig = require('../config/webpackDevServer.config');
 
@@ -40,10 +40,11 @@ const {
 
 module.exports = () => {
   const formattedConfig = format(config);
+  docom.config = formattedConfig;
+  const paths = getPaths({ from: 'start' });
   const fileTree = getFileTree(formattedConfig.modules, formattedConfig.files);
   createSourceFile(fileTree);
   createImportsFile(fileTree);
-
   const useYarn = fs.existsSync(paths.yarnLockFile);
   const isInteractive = process.stdout.isTTY;
 

@@ -2,19 +2,24 @@ const path = require('path');
 const fs = require('fs');
 const url = require('url');
 
-const projectRoot = process.cwd();
-const projectNodeModulesPath = path.resolve(projectRoot, 'node_modules');
-const DOCOM_CORE = 'docom-core';
-const ENTRY_TYPE = 'docom-entry-react';
-const entryModulePath = path.resolve(projectNodeModulesPath, ENTRY_TYPE);
-const entryIndex = path.resolve(entryModulePath, 'index.jsx');
-const theme = 'docom-theme-one';
-const themePath = path.resolve(projectNodeModulesPath, theme);
+const DEFAULT_ENTRY_TYPE = 'react';
+const DEFAULT_THEME = 'docom-theme-one';
+const DEFAULT_CONFIG = {
+  theme: DEFAULT_THEME,
+  entryType: DEFAULT_ENTRY_TYPE,
+};
 
+const DOCOM_CORE_MODULE = 'docom-core';
+const NODE_MODULES = 'node_modules';
+const ENTRY_PREFIX = 'docom-entry-';
+const ENTRY_INDEX_DEFAULTL_FILE_NAME = 'index.js';
+
+const projectRoot = process.cwd();
+const projectNodeModulesPath = path.resolve(projectRoot, NODE_MODULES);
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebook/create-react-app/issues/637
 const bishengDirectory = fs.realpathSync(
-  path.join(projectNodeModulesPath, DOCOM_CORE)
+  path.join(projectNodeModulesPath, DOCOM_CORE_MODULE)
 );
 const resolveBishengApp = relativePath => path.resolve(bishengDirectory, relativePath);
 const appDirectory = fs.realpathSync(process.cwd());
@@ -76,29 +81,34 @@ const resolveModule = (resolveFn, filePath) => {
   return resolveFn(`${filePath}.js`);
 };
 
-// config after eject: we're in ./config/
-module.exports = {
-  dotenv: resolveApp('.env'),
-  theme: themePath,
-  appPath: projectRoot,
-  appBuild: resolveBishengApp('build'),
-  appPublic: resolveBishengApp('public'),
-  appHtml: resolveBishengApp('public/index.html'),
-  // appIndexJs: resolveModule(resolveApp, 'entries/index'),
-  entryModule: entryModulePath,
-  appIndexJs: entryIndex,
-  appPackageJson: resolveApp('package.json'),
-  appSrc: projectRoot,
-  appTsConfig: resolveApp('tsconfig.json'),
-  appJsConfig: resolveApp('jsconfig.json'),
-  yarnLockFile: resolveApp('yarn.lock'),
-  testsSetup: resolveModule(resolveApp, 'src/setupTests'),
-  proxySetup: resolveApp('src/setupProxy.js'),
-  appNodeModules: resolveApp('node_modules'),
-  publicUrl: getPublicUrl(resolveApp('package.json')),
-  servedPath: getServedPath(resolveApp('package.json')),
+module.exports = ({ from }) => {
+  console.log(from, docom.config);
+  const mergedConfig = Object.assign({}, DEFAULT_CONFIG, docom.config);
+
+  const entryModule = ENTRY_PREFIX + mergedConfig.entryType;
+  const entryModulePath = path.resolve(projectNodeModulesPath, entryModule);
+  const entryIndex = path.resolve(entryModulePath, ENTRY_INDEX_DEFAULTL_FILE_NAME);
+  const themePath = path.resolve(projectNodeModulesPath, mergedConfig.theme);
+  console.log(themePath);
+  return {
+    dotenv: resolveApp('.env'),
+    theme: themePath,
+    appPath: projectRoot,
+    appBuild: resolveBishengApp('build'),
+    appPublic: resolveBishengApp('public'),
+    appHtml: resolveBishengApp('public/index.html'),
+    entryModule: entryModulePath,
+    appIndexJs: entryIndex,
+    appPackageJson: resolveApp('package.json'),
+    appSrc: projectRoot,
+    appTsConfig: resolveApp('tsconfig.json'),
+    appJsConfig: resolveApp('jsconfig.json'),
+    yarnLockFile: resolveApp('yarn.lock'),
+    testsSetup: resolveModule(resolveApp, 'src/setupTests'),
+    proxySetup: resolveApp('src/setupProxy.js'),
+    appNodeModules: resolveApp('node_modules'),
+    publicUrl: getPublicUrl(resolveApp('package.json')),
+    servedPath: getServedPath(resolveApp('package.json')),
+    moduleFileExtensions: moduleFileExtensions,
+  };
 };
-
-
-
-module.exports.moduleFileExtensions = moduleFileExtensions;

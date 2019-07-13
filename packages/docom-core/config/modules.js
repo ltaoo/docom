@@ -1,9 +1,11 @@
-'use strict';
+
 
 const fs = require('fs');
 const path = require('path');
-const paths = require('./paths');
+const getPaths = require('./paths');
 const chalk = require('react-dev-utils/chalk');
+
+const paths = getPaths({ from: 'modules' });
 
 /**
  * Get the baseUrl of a compilerOptions object.
