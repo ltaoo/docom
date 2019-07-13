@@ -39,10 +39,14 @@ const {
 } = require('./utils');
 
 module.exports = () => {
-  console.log('start', config);
   const formattedConfig = format(config);
   docom.config = formattedConfig;
   const paths = getPaths({ from: 'start' });
+
+  const { theme } = paths;
+  const themeConfig = require(path.resolve(theme, 'theme.config'));
+  const { hooks: themeHooks } = themeConfig;
+  const hooks = themeHooks;
   const fileTree = getFileTree(formattedConfig.modules, formattedConfig.files);
   createSourceFile(fileTree);
   createImportsFile(fileTree);
@@ -90,6 +94,11 @@ module.exports = () => {
         return;
       }
       const config = configFactory('development');
+      config.resolve.alias.react = path.resolve(paths.entryModule, 'node_modules/react');
+      if (hooks.beforeCompile) {
+        hooks.beforeCompile(config);
+      }
+      console.log(config);
       const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
       const appName = require(paths.appPackageJson).name;
       const useTypeScript = fs.existsSync(paths.appTsConfig);
