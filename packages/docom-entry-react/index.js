@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import App from '@root/theme/App';
+import App from '@theme/App';
 import source from '@root/.docom/source.json';
 import imports from '@root/.docom/imports';
 import './index.css';

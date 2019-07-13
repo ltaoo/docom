@@ -1,0 +1,17 @@
+{
+  "name": "docom-theme-one",
+  "version": "0.1.0",
+  "description": "",
+  "main": "App.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react-router-dom": "^5.0.1",
+    "ramda": "^0.26.1",
+    "jsonml-to-react-element": "^1.1.11"
+  }
+}
