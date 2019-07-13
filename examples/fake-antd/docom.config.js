@@ -6,5 +6,9 @@ module.exports = {
       title: '組件',
       path: './src/components',
     },
+    develop: {
+      title: '开发说明',
+      path: './docs/develop',
+    },
   },
 };
