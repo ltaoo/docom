@@ -10,8 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "react-router-dom": "^5.0.1",
+    "jsonml-to-react-element": "^1.1.11",
     "ramda": "^0.26.1",
-    "jsonml-to-react-element": "^1.1.11"
+    "react-router-dom": "^5.0.1"
   }
 }
