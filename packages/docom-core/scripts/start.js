@@ -16,7 +16,7 @@ const path = require('path');
 const chalk = require('react-dev-utils/chalk');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
-const clearConsole = require('react-dev-utils/clearConsole');
+// const clearConsole = require('react-dev-utils/clearConsole');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const {
     choosePort,
@@ -86,13 +86,14 @@ module.exports = (argv) => {
         ...formattedConfig,
         hooks: mergedHooks,
         plugins: mergedPlugins,
+        paths,
     };
 
     const hooks = mergedHooks;
 
     const fileTree = getFileTree(formattedConfig.modules, formattedConfig.files);
-    createSourceFile(fileTree, formattedConfig);
-    createImportsFile(fileTree);
+    createSourceFile(fileTree, docom.config);
+    createImportsFile(fileTree, docom.config);
 
     const useYarn = fs.existsSync(paths.yarnLockFile);
     const isInteractive = process.stdout.isTTY;
@@ -138,7 +139,9 @@ module.exports = (argv) => {
             const config = configFactory('development');
             config.resolve.alias.react = path.resolve(paths.entryModule, 'node_modules/react');
             if (hooks.beforeCompile) {
-                hooks.beforeCompile(config);
+                hooks.beforeCompile.forEach((hook) => {
+                    hook(config);
+                });
             }
             const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
             const appName = require(paths.appPackageJson).name;
@@ -174,7 +177,7 @@ module.exports = (argv) => {
                     return console.log(err);
                 }
                 if (isInteractive) {
-                    clearConsole();
+                    // clearConsole();
                 }
 
                 // We used to support resolving modules according to `NODE_PATH`.

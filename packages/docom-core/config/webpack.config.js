@@ -22,7 +22,7 @@ const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpack
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 
 const postcssNormalize = require('postcss-normalize');
-const getPaths = require('./paths');
+const pathsFacotry = require('./paths');
 // const modules = require('./modules');
 const getClientEnvironment = require('./env');
 
@@ -42,7 +42,7 @@ const cssModuleRegex = /\.module\.css$/;
 // This is the production and development configuration.
 // It is focused on developer experience, fast rebuilds, and a minimal bundle.
 module.exports = (webpackEnv) => {
-    const paths = getPaths({ from: 'webpack.config' });
+    const paths = pathsFacotry({ config: docom.config, from: 'webpack.config' });
 
     // Check if TypeScript is setup
     const useTypeScript = fs.existsSync(paths.appTsConfig);

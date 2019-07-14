@@ -1,11 +1,11 @@
 const fs = require('fs');
 const path = require('path');
-const getPaths = require('./paths');
+const pathsFactory = require('./paths');
 
 // Make sure that including paths.js after env.js will read .env variables.
 delete require.cache[require.resolve('./paths')];
 
-const paths = getPaths({ from: 'env' });
+const paths = pathsFactory({ from: 'env' });
 
 const { NODE_ENV } = process.env;
 if (!NODE_ENV) {

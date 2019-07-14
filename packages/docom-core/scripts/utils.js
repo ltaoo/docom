@@ -297,12 +297,20 @@ function createSourceFile(fileTree, config) {
         // 可以对 markdown data 做修改
         const { plugins } = config;
         plugins.forEach(([plugin, opt]) => {
-            const p = require(plugin);
-            console.log(p, opt);
-            // const { hooks: { transform } } = p;
-            // transform(markdownData, opt);
+            if (plugin === undefined) {
+                return;
+            }
+            const util = require(require.resolve(plugin, {
+                paths: [
+                    config.paths.theme,
+                    config.paths.entry,
+                ],
+            }));
+            const { hooks } = util;
+            if (hooks && hooks.modifyMarkdownData) {
+                hooks.modifyMarkdownData(markdownData, opt);
+            }
         });
-        process.exit(1);
         delete markdownData.content;
         return markdownData;
     });
@@ -355,11 +363,9 @@ function mergeSameNameKey(a, b) {
  * @param  {...any} hooksGroup
  */
 function mergeHooks(...hooksGroup) {
-    console.log(hooksGroup);
     return hooksGroup.reduce((group, hooks) => mergeSameNameKey(group, hooks), {});
 }
 function mergePlugins(...pluginsGroup) {
-    console.log(pluginsGroup);
     return pluginsGroup.reduce((group, plugins) => group.concat(plugins), []);
 }
 
