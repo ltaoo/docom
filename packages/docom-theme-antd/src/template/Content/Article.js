@@ -37,7 +37,12 @@ export default class Article extends React.Component {
     }
 
     render() {
-        const { meta, content, description } = this.props;
+        const {
+            meta,
+            content,
+            description,
+            toc,
+        } = this.props;
         const { title, subtitle } = meta;
         const {
             intl: { locale },
@@ -54,10 +59,10 @@ export default class Article extends React.Component {
                         : toReactComponent(
                             ['section', { className: 'markdown' }].concat(getChildren(description)),
                         )}
-                    {!content.toc || content.toc.length <= 1 || meta.toc === false ? null : (
+                    {!toc || toc.length <= 1 ? null : (
                         <Affix className="toc-affix" offsetTop={16}>
                             {toReactComponent(
-                                ['ul', { className: 'toc' }].concat(getChildren(content.toc)),
+                                ['ul', { className: 'toc' }].concat(getChildren(toc)),
                             )}
                         </Affix>
                     )}

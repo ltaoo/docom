@@ -90,6 +90,8 @@ export default class MainContent extends Component {
                 this.setState({
                     meta: response.meta,
                     content: response.content,
+                    toc: response.toc,
+                    markdownData: response,
                 });
             })
             .catch(() => { })
@@ -303,7 +305,7 @@ export default class MainContent extends Component {
     render() {
         const { props } = this;
         const {
-            error, loading, openKeys, meta, content,
+            error, loading, openKeys, meta, content, toc,
         } = this.state;
         if (error === 404) {
             return <NotFound />;
@@ -344,7 +346,12 @@ export default class MainContent extends Component {
                     </Col>
                     <Col xxl={20} xl={19} lg={18} md={24} sm={24} xs={24}>
                         <section className={mainContainerClass}>
-                            <Article {...props} content={content} meta={meta} />
+                            <Article
+                                {...props}
+                                content={content}
+                                meta={meta}
+                                toc={toc}
+                            />
                         </section>
                         <PrevAndNext prev={prev} next={next} />
                     </Col>

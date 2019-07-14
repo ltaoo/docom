@@ -28,6 +28,11 @@ module.exports = {
         反馈: 5,
         其他: 6,
     },
+    plugins: [
+        ['docom-plugin-toc', {
+            maxDepth: 6,
+        }],
+    ],
     hooks: {
         beforeCompile(webpackConfig) {
             /* eslint-disable no-param-reassign */
@@ -59,6 +64,7 @@ module.exports = {
                     },
                 ],
             };
+            // @TODO 不能靠 index 定位
             webpackConfig.module.rules[2].oneOf.splice(4, 0, lessRule);
         },
     },
