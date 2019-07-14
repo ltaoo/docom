@@ -7,7 +7,9 @@ import {
 import classNames from 'classnames';
 import * as R from 'ramda';
 import get from 'lodash/get';
+import NProgress from 'nprogress';
 
+import LoadingPage from './LoadingPage';
 import Article from './Article';
 import PrevAndNext from './PrevAndNext';
 import NotFound from '../NotFound';
@@ -67,52 +69,6 @@ const getSideBarOpenKeys = (nextProps) => {
 };
 
 export default class MainContent extends Component {
-    constructor(props) {
-        super(props);
-
-        // 这部分逻辑作为 collect 公共方法
-        const { location: { pathname }, imports } = props;
-        let paths = pathname.split('/').filter(Boolean);
-        let c = R.path(paths, imports);
-        if (typeof c === 'object') {
-            paths = paths.concat('index');
-            c = R.path(paths, imports);
-        }
-        // @TODO  404 判断需要优化
-        if (c === undefined && pathname !== '/') {
-            this.state = {
-                error: 404,
-            };
-            return;
-        }
-        c()
-            .then((response) => {
-                this.setState({
-                    meta: response.meta,
-                    content: response.content,
-                    toc: response.toc,
-                    markdownData: response,
-                });
-            })
-            .catch(() => { })
-            .finally(() => {
-                this.setState({
-                    loading: false,
-                });
-            });
-
-        this.state = {
-            openKeys: undefined,
-            loading: true,
-            content: [],
-            pathname,
-        };
-    }
-
-    componentDidMount() {
-        this.componentDidUpdate();
-    }
-
     static getDerivedStateFromProps(props, state) {
         if (!state.openKeys) {
             return {
@@ -121,6 +77,34 @@ export default class MainContent extends Component {
             };
         }
         return null;
+    }
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            openKeys: undefined,
+            loading: true,
+            content: null,
+            nkey: null,
+        };
+    }
+
+    componentDidMount() {
+        const { nkey } = this.state;
+        const { history } = this.props;
+        this.updatePage();
+        this.listener = history.listen((route) => {
+            console.log(route.pathname, nkey);
+            if (route.pathname !== nkey) {
+                NProgress.start();
+                console.log('change paget');
+                this.updatePage(route.pathname)
+                    .then(() => {
+                        NProgress.done();
+                    });
+            }
+        });
     }
 
     componentDidUpdate(prevProps) {
@@ -152,6 +136,7 @@ export default class MainContent extends Component {
 
     componentWillUnmount() {
         this.scroller.disable();
+        // this.listener.unlisten();
     }
 
     /**
@@ -201,6 +186,40 @@ export default class MainContent extends Component {
         const prev = menuItemsList[activeMenuItemIndex - 1];
         const next = menuItemsList[activeMenuItemIndex + 1];
         return { prev, next };
+    }
+
+    updatePage = (path) => {
+        // 这部分逻辑作为 collect 公共方法
+        const { location: { pathname: prevPathname }, imports } = this.props;
+        const pathname = path || prevPathname;
+        let paths = pathname.split('/').filter(Boolean);
+        let c = R.path(paths, imports);
+        if (typeof c === 'object') {
+            paths = paths.concat('index');
+            c = R.path(paths, imports);
+        }
+        // @TODO  404 判断需要优化
+        if (c === undefined && pathname !== '/') {
+            this.state = {
+                error: 404,
+            };
+            return;
+        }
+        return c()
+            .then((response) => {
+                this.setState({
+                    meta: response.meta,
+                    content: response.content,
+                    toc: response.toc,
+                    markdownData: response,
+                });
+            })
+            .catch(() => { })
+            .finally(() => {
+                this.setState({
+                    loading: false,
+                });
+            });
     }
 
     handleMenuOpenChange = (openKeys) => {
@@ -305,13 +324,14 @@ export default class MainContent extends Component {
     render() {
         const { props } = this;
         const {
-            error, loading, openKeys, meta, content, toc,
+            loading, error, openKeys, meta, content, toc,
         } = this.state;
+        const isInitial = content === null;
         if (error === 404) {
             return <NotFound />;
         }
-        if (loading) {
-            return <p>Loading</p>;
+        if (loading && isInitial) {
+            return <LoadingPage />;
         }
         const activeMenuItem = getActiveMenuItem(props);
         const menuItems = this.getMenuItems();

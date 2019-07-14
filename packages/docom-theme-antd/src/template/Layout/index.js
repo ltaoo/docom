@@ -47,7 +47,7 @@ export default class BasicLayout extends React.Component {
                                         const { pathname } = props.location;
                                         return (
                                             <MainContent
-                                                key={pathname}
+                                                nkey={pathname}
                                                 themeConfig={themeConfig}
                                                 {...props}
                                                 {...this.props}
