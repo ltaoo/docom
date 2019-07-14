@@ -6,7 +6,6 @@ const marktwain = require('mark-twain');
 const R = require('ramda');
 const glob = require('glob');
 const _ = require('lodash');
-const JsonML = require('jsonml.js/lib/utils');
 
 const constants = require('../constants');
 
@@ -258,29 +257,6 @@ function normalizeFilePath(filepath, sources) {
 }
 
 /**
- * 从 markdown 中解析 hr 并添加 description
- * @param {MarkdownData} markdownData
- * @return {MarkdownData}
- */
-function getDescription(markdownData) {
-    const { content } = markdownData;
-    const result = { ...markdownData };
-    const contentChildren = JsonML.getChildren(content);
-    const dividerIndex = contentChildren.findIndex(node => JsonML.getTagName(node) === 'hr');
-
-    if (dividerIndex >= 0) {
-        result.description = ['section']
-            .concat(contentChildren.slice(0, dividerIndex));
-        result.content = [
-            JsonML.getTagName(content),
-            JsonML.getAttributes(content) || {},
-        ].concat(contentChildren.slice(dividerIndex + 1));
-    }
-
-    return result;
-}
-
-/**
  * 生成 source.json 文件
  * @param {FileTree} fileTree
  * @param {FormattedDocomConfig} config
@@ -382,7 +358,6 @@ module.exports = {
     createImportsContent,
     createSourceFile,
     normalizeFilePath,
-    getDescription,
     mergeSameNameKey,
     mergeHooks,
     mergePlugins,
