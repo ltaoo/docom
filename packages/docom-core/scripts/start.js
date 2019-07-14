@@ -26,30 +26,74 @@ const {
 } = require('react-dev-utils/WebpackDevServerUtils');
 const openBrowser = require('react-dev-utils/openBrowser');
 
-const getPaths = require('../config/paths');
+const pathsFactory = require('../config/paths');
 const configFactory = require('../config/webpack.config');
 const createDevServerConfig = require('../config/webpackDevServer.config');
-
-const docomConfig = require(path.join(process.cwd(), 'docom.config'));
 const {
+    validateConfig,
     format,
     getFileTree,
     createImportsFile,
     createSourceFile,
+    mergeHooks,
+    mergePlugins,
 } = require('./utils');
 
-module.exports = () => {
-    const formattedConfig = format(docomConfig);
-    docom.config = formattedConfig;
-    const paths = getPaths({ from: 'start' });
+const DEFAULT_DOCOM_CONFIG_FILENAME = 'docom.config';
 
-    const { theme } = paths;
+/**
+ * interface Command = 'dev' | 'build' | 'deploy';
+ * interface Argv {
+ *      _: Array<Command>;
+ *      // 如果参数有值，就是 argv[opt]
+ *      [opt: string]: boolean | string;
+ *      '$0': string;
+ * }
+ * @param {Argv} argv
+ */
+module.exports = (argv) => {
+    console.log(argv);
+    const docomConfig = require(path.resolve(process.cwd(), DEFAULT_DOCOM_CONFIG_FILENAME));
+    if (validateConfig(docomConfig)) {
+        process.exit(1);
+    }
+    const formattedConfig = format(docomConfig);
+    const paths = pathsFactory({ config: formattedConfig, from: 'start' });
+
+    const { theme, entry } = paths;
     const themeConfig = require(path.resolve(theme, 'theme.config'));
-    const { hooks: themeHooks } = themeConfig;
-    const hooks = themeHooks;
+    const entryConfig = require(path.resolve(entry, 'entry.config'));
+    if (themeConfig === undefined) {
+        console.log('主题中必须包含 theme.config.js 文件');
+        process.exit(1);
+    }
+    const {
+        hooks: docomHooks,
+        plugins: docomPlugins,
+    } = docomConfig;
+    const {
+        hooks: themeHooks,
+        plugins: themePlugins,
+    } = themeConfig;
+    const {
+        hooks: entryHooks,
+        plugins: entryPlugins,
+    } = entryConfig;
+
+    const mergedHooks = mergeHooks(docomHooks, entryHooks, themeHooks);
+    const mergedPlugins = mergePlugins(docomPlugins, entryPlugins, themePlugins);
+    docom.config = {
+        ...formattedConfig,
+        hooks: mergedHooks,
+        plugins: mergedPlugins,
+    };
+
+    const hooks = mergedHooks;
+
     const fileTree = getFileTree(formattedConfig.modules, formattedConfig.files);
     createSourceFile(fileTree, formattedConfig);
     createImportsFile(fileTree);
+
     const useYarn = fs.existsSync(paths.yarnLockFile);
     const isInteractive = process.stdout.isTTY;
 

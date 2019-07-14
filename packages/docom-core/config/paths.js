@@ -14,20 +14,18 @@ const path = require('path');
 const fs = require('fs');
 const url = require('url');
 
-const DEFAULT_ENTRY_TYPE = 'react';
-// const DEFAULT_THEME = 'docom-theme-one';
-const DEFAULT_CONFIG = {
-    // theme: DEFAULT_THEME,
-    entryType: DEFAULT_ENTRY_TYPE,
-};
+const constants = require('../constants');
 
-const DOCOM_CORE_MODULE = 'docom-core';
-const NODE_MODULES = 'node_modules';
-const ENTRY_PREFIX = 'docom-entry-';
-const ENTRY_INDEX_DEFAULTL_FILE_NAME = 'index.js';
+const {
+    DOCOM_CORE_MODULE,
+    NODE_MODULES,
+    ENTRY_PREFIX,
+    ENTRY_INDEX_DEFAULTL_FILE_NAME,
+} = constants;
 
 // 執行命令行的目錄，一般都是自己的項目根目錄
 const projectRoot = fs.realpathSync(process.cwd());
+// 先检查下是不是根目录？
 const projectNodeModulesPath = path.resolve(projectRoot, NODE_MODULES);
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebook/create-react-app/issues/637
@@ -86,7 +84,10 @@ const resolveModule = (resolveFn, filePath) => {
     return resolveFn(`${filePath}.js`);
 };
 
-module.exports = () => {
+/**
+ * @return {Paths}
+ */
+module.exports = ({ config }) => {
     const basePaths = {
         appPath: projectRoot,
         dotenv: resolveProject('.env'),
@@ -108,19 +109,18 @@ module.exports = () => {
         appSrc: projectRoot,
         moduleFileExtensions,
     };
-    if (Object.keys(docom.config).length === 0) {
+    if (config === undefined || Object.keys(config).length === 0) {
         return basePaths;
     }
-    const mergedConfig = Object.assign({}, DEFAULT_CONFIG, docom.config);
-    docom.config = mergedConfig;
 
-    const entryModule = ENTRY_PREFIX + mergedConfig.entryType;
+    const entryModule = ENTRY_PREFIX + config.entryType;
     const entryModulePath = path.resolve(projectNodeModulesPath, entryModule);
     const entryIndex = path.resolve(entryModulePath, ENTRY_INDEX_DEFAULTL_FILE_NAME);
-    const themePath = path.resolve(projectNodeModulesPath, mergedConfig.theme);
+    const themePath = path.resolve(projectNodeModulesPath, config.theme);
     return Object.assign(basePaths, {
         theme: themePath,
         entryModule: entryModulePath,
+        entry: entryModulePath,
         appIndexJs: entryIndex,
     });
 };

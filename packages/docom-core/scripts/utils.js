@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 const fs = require('fs');
 const path = require('path');
 
@@ -5,14 +6,34 @@ const marktwain = require('mark-twain');
 const R = require('ramda');
 const glob = require('glob');
 const _ = require('lodash');
+const JsonML = require('jsonml.js/lib/utils');
+
+const constants = require('../constants');
+
+const {
+    DEFAULT_CONFIG,
+} = constants;
+
+/**
+ * 对 docom config 校验
+ * @param {DocomConfig} conf
+ * @return {DocomConfig}
+ */
+function validateConfig(conf) {
+    if (conf.theme === undefined) {
+        return '[error] 请配置 theme';
+    }
+    return false;
+}
 
 /**
  * 处理配置项
- * @param {Config} conf
+ * @param {DocomConfig} conf
+ * @return {FormattedDocomConfig}
  */
 function format(conf) {
     const { modules } = conf;
-    return {
+    return Object.assign({}, DEFAULT_CONFIG, {
         ...conf,
         modules: Object.keys(modules).map((key) => {
             const module = modules[key];
@@ -22,7 +43,7 @@ function format(conf) {
                 absolutePath: path.resolve(module.path),
             };
         }),
-    };
+    });
 }
 
 const globConfig = {
@@ -33,7 +54,13 @@ const globConfig = {
     matchBase: true,
 };
 
-function collectFiles(module, files = ['**/*.md']) {
+/**
+ * 从项目中递归获取指定文件
+ * @param {string} module
+ * @param {Array<string>} files
+ * @return {Array<string>}
+ */
+function collectFiles(module, files) {
     const { path: modulePath } = module;
     const searchPath = path.resolve(modulePath);
     return glob.sync(files, { ...globConfig, cwd: searchPath });
@@ -94,7 +121,7 @@ function getLastFileTree(module, files) {
 /**
  * 根据配置项中的 modules 遍历出 md 文件
  * interface Modules {
- *   [key: string]: Module;
+ *   [module: string]: Module;
  * }
  * interface Module {
  *   title: string;
@@ -122,6 +149,8 @@ function getFileTree(modules, files) {
 /**
  * 递归处理 md 文件路径
  * @param {FileTree} fileTree
+ * @param {function} action - 处理 md 路径的方式
+ * @return {ProcessedFileTree}
  */
 function processRelativePath(fileTree) {
     function foo(tree, callback, file) {
@@ -153,10 +182,19 @@ function addRootAlias(fileTree, prefix) {
     return processRelativePath(fileTree)(relativePath => prefix + relativePath);
 }
 
+/**
+ * @param {FileTree} fileTree
+ * @return {FileTree}
+ */
 function addPlaceholder(fileTree) {
     return processRelativePath(fileTree)(relativePath => `{{${relativePath}}}`);
 }
 
+/**
+ * 生成文件
+ * @param {string} file - 要创建的文件名
+ * @param {string} raw - 写入的文件内容
+ */
 const touch = (file, raw) => new Promise(async (resolve, reject) => {
     const content = raw;
     const stream = fs.createWriteStream(file);
@@ -166,6 +204,12 @@ const touch = (file, raw) => new Promise(async (resolve, reject) => {
     stream.end();
 });
 
+/**
+ * 生成 imports.js 文件的内容
+ * // @TODO: 不用正则实现
+ * @param {FileTree} fileTree
+ * @return {string}
+ */
 function createImportsContent(fileTree) {
     const text = JSON.stringify(fileTree, null, '  ')
     // .replace(/"/g, '')
@@ -174,14 +218,24 @@ function createImportsContent(fileTree) {
     return `module.exports = ${text}`;
 }
 
+/**
+ * 创建 imports.js 文件
+ * @param {FileTree} fileTree
+ */
 function createImportsFile(fileTree) {
     const source = addPlaceholder(addRootAlias(fileTree, '@root/'));
+    // @TODO: .docom 文件夹在初始化的时候创建
     fs.mkdir(path.resolve(process.cwd(), '.docom'), () => {
         const content = createImportsContent(source);
         touch(path.resolve(process.cwd(), '.docom/imports.js'), content);
     });
 }
 
+/**
+ *
+ * @param {string} pathname
+ * @return {string}
+ */
 function removePrefixPath(pathname) {
     return pathname.replace(/^\.\//g, '');
 }
@@ -203,21 +257,114 @@ function normalizeFilePath(filepath, sources) {
     return filepath.replace(removePrefixPath(source.path), source.key);
 }
 
+/**
+ * 从 markdown 中解析 hr 并添加 description
+ * @param {MarkdownData} markdownData
+ * @return {MarkdownData}
+ */
+function getDescription(markdownData) {
+    const { content } = markdownData;
+    const result = { ...markdownData };
+    const contentChildren = JsonML.getChildren(content);
+    const dividerIndex = contentChildren.findIndex(node => JsonML.getTagName(node) === 'hr');
+
+    if (dividerIndex >= 0) {
+        result.description = ['section']
+            .concat(contentChildren.slice(0, dividerIndex));
+        result.content = [
+            JsonML.getTagName(content),
+            JsonML.getAttributes(content) || {},
+        ].concat(contentChildren.slice(dividerIndex + 1));
+    }
+
+    return result;
+}
+
+/**
+ * 生成 source.json 文件
+ * @param {FileTree} fileTree
+ * @param {FormattedDocomConfig} config
+ */
 function createSourceFile(fileTree, config) {
+    const cwd = process.cwd();
     const content = processRelativePath(fileTree)((relativePath) => {
-        const absolutePath = path.resolve(process.cwd(), relativePath);
-        // 在这里解析完返回？
-        const mdContent = marktwain(fs.readFileSync(absolutePath, 'utf-8'));
-        mdContent.meta.realpath = relativePath;
-        mdContent.meta.filename = normalizeFilePath(relativePath, config.modules);
-        return mdContent;
+        const absolutePath = path.resolve(cwd, relativePath);
+        // @TODO 这里应该很耗性能，不仅要读取文件，还要解析。需要优化
+        const markdownData = marktwain(fs.readFileSync(absolutePath, 'utf-8'));
+        markdownData.meta.realpath = relativePath;
+        markdownData.meta.filename = normalizeFilePath(relativePath, config.modules);
+
+        // 可以对 markdown data 做修改
+        const { plugins } = config;
+        plugins.forEach(([plugin, opt]) => {
+            const p = require(plugin);
+            console.log(p, opt);
+            // const { hooks: { transform } } = p;
+            // transform(markdownData, opt);
+        });
+        process.exit(1);
+        delete markdownData.content;
+        return markdownData;
     });
-    fs.mkdir(path.resolve(process.cwd(), '.docom'), () => {
-        touch(path.resolve(process.cwd(), '.docom/source.json'), JSON.stringify(content));
+    fs.mkdir(path.resolve(cwd, '.docom'), () => {
+        touch(path.resolve(cwd, '.docom/source.json'), JSON.stringify(content));
     });
 }
 
+function intersectionKeys(a, b) {
+    return a.filter(key => b.includes(key));
+}
+function differenceKeys(a, b) {
+    return a.concat(b).filter(v => !a.includes(v) || !b.includes(v));
+}
+/**
+ * 合并两个对象的同名键对应的值为数组
+ * @example
+ *  const a = { foo: 'a' };
+ *  const b = { foo: 'b' };
+ *  const result = mergeSameNameKey(a, b);
+ *  result === {
+ *      foo: ['a', 'b'],
+ *  };
+ * @param {Object} a
+ * @param {Object} b
+ */
+function mergeSameNameKey(a, b) {
+    const aKeys = Object.keys(a);
+    const bKeys = Object.keys(b);
+    // 获取交集
+    const commonKeys = intersectionKeys(aKeys, bKeys);
+    // 获取差集
+    const aRestKeys = differenceKeys(aKeys, commonKeys);
+    const bRestKeys = differenceKeys(bKeys, commonKeys);
+
+    const result = {};
+    commonKeys.forEach((key) => {
+        result[key] = [a[key], b[key]];
+    });
+    aRestKeys.forEach((key) => {
+        result[key] = [a[key]];
+    });
+    bRestKeys.forEach((key) => {
+        result[key] = [b[key]];
+    });
+    return result;
+}
+/**
+ * 将多个 hooks 合并
+ * @param  {...any} hooksGroup
+ */
+function mergeHooks(...hooksGroup) {
+    console.log(hooksGroup);
+    return hooksGroup.reduce((group, hooks) => mergeSameNameKey(group, hooks), {});
+}
+function mergePlugins(...pluginsGroup) {
+    console.log(pluginsGroup);
+    return pluginsGroup.reduce((group, plugins) => group.concat(plugins), []);
+}
+
 module.exports = {
+    validateConfig,
     format,
     toMatch,
     filesToTreeStructure,
@@ -229,4 +376,8 @@ module.exports = {
     createImportsContent,
     createSourceFile,
     normalizeFilePath,
+    getDescription,
+    mergeSameNameKey,
+    mergeHooks,
+    mergePlugins,
 };

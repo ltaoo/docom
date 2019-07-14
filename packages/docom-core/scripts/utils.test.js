@@ -1,3 +1,5 @@
+const marktwain = require('mark-twain');
+
 const utils = require('./utils');
 
 describe('utils', () => {
@@ -15,6 +17,7 @@ describe('utils', () => {
         const result = utils.format(config);
 
         expect(result).toEqual({
+            entryType: 'react',
             files: ['**/*.md'],
             modules: [
                 {
@@ -24,6 +27,10 @@ describe('utils', () => {
                     absolutePath: '/Users/ltaoo/Documents/fake-bisheng/packages/docom-core/docs/develop',
                 },
             ],
+            output: '_docom',
+            title: 'Docom',
+            plugins: [],
+            hooks: {},
         });
     });
 
@@ -188,5 +195,74 @@ describe('utils', () => {
         const result = utils.normalizeFilePath(filename, formatedConfig.modules);
 
         expect(result).toBe('components/index.md');
+    });
+
+    it('getDescription', () => {
+        const content = `
+---
+title: Button
+subtitle: 按钮
+---
+
+这是按钮
+
+---
+
+开始我们的正文内容`;
+        const markdownData = marktwain(content);
+        const result = utils.getDescription(markdownData);
+
+        expect(result).toEqual({
+            meta: {},
+            content: [
+                'article',
+                {
+                    position: {
+                        start: {
+                            column: 1,
+                            line: 2,
+                            offset: 1,
+                        },
+                        end: {
+                            column: 4,
+                            line: 5,
+                            offset: 35,
+                        },
+                        indent: [1, 1, 1],
+                    },
+                    type: 'yaml',
+                    value: `title: Button
+subtitle: 按钮`,
+                },
+                [
+                    'p',
+                    '开始我们的正文内容',
+                ],
+            ],
+            description: [
+                'section',
+                [
+                    'p',
+                    '这是按钮',
+                ],
+            ],
+        });
+    });
+
+    it('mergeSameNameKey', () => {
+        const a = {
+            foo: 2,
+            bar: 'bar',
+        };
+        const b = {
+            foo: 5,
+        };
+
+        const result = utils.mergeSameNameKey(a, b);
+
+        expect(result).toEqual({
+            foo: [2, 5],
+            bar: ['bar'],
+        });
     });
 });
