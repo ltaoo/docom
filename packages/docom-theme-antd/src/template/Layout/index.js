@@ -9,49 +9,59 @@ import 'antd/dist/antd.css';
 import themeConfig from '@theme/theme.config';
 
 import Header from './Header';
+import MainContent from '../Content/MainContent';
+import NotFound from '../NotFound';
 import * as utils from '../utils';
 import enLocale from '../../en-US';
 import cnLocale from '../../zh-CN';
 import '../../static/style';
-import MainContent from '../Content/MainContent';
 
 export default class BasicLayout extends React.Component {
-  constructor(props) {
-    super(props);
-    const { pathname } = props.location;
-    const appLocale = utils.isZhCN(pathname) ? cnLocale : enLocale;
-    addLocaleData(appLocale.data);
+    constructor(props) {
+        super(props);
 
-    this.state = {
-      appLocale,
-    };
-  }
+        const { location: { pathname } } = props;
+        const appLocale = utils.isZhCN(pathname) ? cnLocale : enLocale;
+        addLocaleData(appLocale.data);
 
-  render() {
-    const { appLocale } = this.state;
-    const { children, source, ...restProps } = this.props;
-    const navs = Object.keys(source).map(module => {
-      const { index: { meta: { title } } } = source[module];
-      return {
-        title,
-        // pathname: `${module}/index`,
-        pathname: module,
-      };
-    });
-    return (
-      <IntlProvider locale={appLocale.locale} messages={appLocale.messages}>
-        <LocaleProvider locale={appLocale.locale === 'zh-CN' ? zhCN : null}>
-          <div className="page-wrapper">
-            <Header navs={navs} {...restProps} />
-            <Switch>
-              <Route path="/:module" render={(props) => {
-                const { pathname } = props.location;
-                return <MainContent key={pathname} themeConfig={themeConfig} {...props} {...this.props} />;
-              }} />
-            </Switch>
-          </div>
-        </LocaleProvider>
-      </IntlProvider>
-    );
-  }
+        this.state = {
+            appLocale,
+        };
+    }
+
+    render() {
+        const { appLocale } = this.state;
+        const { children, ...restProps } = this.props;
+        const { source } = restProps;
+        const modules = Object.keys(source);
+        return (
+            <IntlProvider locale={appLocale.locale} messages={appLocale.messages}>
+                <LocaleProvider locale={appLocale.locale === 'zh-CN' ? zhCN : null}>
+                    <div className="page-wrapper">
+                        <Header {...restProps} />
+                        <Switch>
+                            {modules.map(module => (
+                                <Route
+                                    path={`/${module}`}
+                                    render={(props) => {
+                                        const { pathname } = props.location;
+                                        return (
+                                            <MainContent
+                                                key={pathname}
+                                                themeConfig={themeConfig}
+                                                {...props}
+                                                {...this.props}
+                                            />
+                                        );
+                                    }}
+                                />
+                            ))}
+                            <Route path="/404" component={NotFound} />
+                            <Route component={NotFound} />
+                        </Switch>
+                    </div>
+                </LocaleProvider>
+            </IntlProvider>
+        );
+    }
 }

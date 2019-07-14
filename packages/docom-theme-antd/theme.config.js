@@ -30,9 +30,10 @@ module.exports = {
     },
     hooks: {
         beforeCompile(webpackConfig) {
-            webpackConfig.module.rules = webpackConfig.module.rules.map(rule => {
+            /* eslint-disable no-param-reassign */
+            webpackConfig.module.rules = webpackConfig.module.rules.map((rule) => {
                 if (rule.oneOf) {
-                    rule.oneOf = rule.oneOf.map(r => {
+                    rule.oneOf = rule.oneOf.map((r) => {
                         if (
                             r.loader
                             && r.loader.indexOf('bable-loader')
@@ -50,7 +51,7 @@ module.exports = {
                 use: [
                     { loader: require.resolve('style-loader') },
                     { loader: require.resolve('css-loader') },
-                    { 
+                    {
                         loader: require.resolve('less-loader'),
                         options: {
                             javascriptEnabled: true,
@@ -59,7 +60,6 @@ module.exports = {
                 ],
             };
             webpackConfig.module.rules[2].oneOf.splice(4, 0, lessRule);
-            // return webpackConfig;
         },
     },
 };
