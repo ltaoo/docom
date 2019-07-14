@@ -15,6 +15,12 @@ module.exports = {
     plugins: [
         'react',
     ],
+    globals: {
+        describe: 'read-only',
+        expect: 'read-only',
+        it: 'read-only',
+        docom: 'read-only',
+    },
     // settings: {
     //     'import/resolver': {
     //         webpack:{
