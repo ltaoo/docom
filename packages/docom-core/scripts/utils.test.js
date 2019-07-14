@@ -24,7 +24,7 @@ describe('utils', () => {
                     absolutePath: '/Users/ltaoo/Documents/fake-bisheng/packages/docom-core/docs/develop',
                 },
             ],
-        })
+        });
     });
 
     describe('filesToTreeStructure', () => {
@@ -154,7 +154,7 @@ describe('utils', () => {
                 test: '{{@root/docs/develop/test.md}}',
                 branch: '{{@root/docs/develop/branch.md}}',
             },
-        }; 
+        };
         const expectResult = `module.exports = {
   "develop": {
     "index": () => import('@root/docs/develop/index.md'),
@@ -179,7 +179,7 @@ describe('utils', () => {
                 components: {
                     title: '組件',
                     path: './src/components',
-                }, 
+                },
             },
         };
         const filename = 'src/components/index.md';
