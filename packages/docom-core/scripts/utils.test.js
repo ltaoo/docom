@@ -211,4 +211,53 @@ describe('utils', () => {
             bar: ['bar'],
         });
     });
+
+    describe('mergeHooks', () => {
+        it('normal', () => {
+            const config = {
+                hooks: {
+                    beforeCompile: 1,
+                },
+            };
+            const entryConfig = {
+                hooks: {
+                    beforeCompile: 2,
+                },
+            };
+            const themeConfig = {
+                hooks: {
+                    beforeCompile: 3,
+                },
+            };
+
+            const result = utils.mergeHooks(config.hooks, entryConfig.hooks, themeConfig.hooks);
+
+            expect(result).toEqual({
+                beforeCompile: [1, 2, 3],
+            });
+        });
+
+        it('empty', () => {
+            const config = {
+                hooks: {
+                    beforeCompile: 1,
+                },
+            };
+            const entryConfig = {
+                hooks: {
+                },
+            };
+            const themeConfig = {
+                hooks: {
+                    beforeCompile: 3,
+                },
+            };
+
+            const result = utils.mergeHooks(config.hooks, entryConfig.hooks, themeConfig.hooks);
+
+            expect(result).toEqual({
+                beforeCompile: [1, 3],
+            });
+        });
+    });
 });

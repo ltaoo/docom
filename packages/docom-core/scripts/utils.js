@@ -272,7 +272,7 @@ function createSourceFile(fileTree, config) {
 
         // 可以对 markdown data 做修改
         const { plugins } = config;
-        plugins.forEach(([plugin, opt]) => {
+        plugins.forEach(([plugin, opt = {}]) => {
             if (plugin === undefined) {
                 return;
             }
@@ -284,7 +284,10 @@ function createSourceFile(fileTree, config) {
             }));
             const { hooks } = util;
             if (hooks && hooks.modifyMarkdownData) {
-                hooks.modifyMarkdownData(markdownData, opt);
+                hooks.modifyMarkdownData(markdownData, {
+                    ...docom,
+                    ...opt,
+                });
             }
         });
         delete markdownData.content;
@@ -324,12 +327,28 @@ function mergeSameNameKey(a, b) {
 
     const result = {};
     commonKeys.forEach((key) => {
+        if (Array.isArray(a[key])) {
+            result[key] = a[key].concat(b[key]);
+            return;
+        }
+        if (Array.isArray(b[key])) {
+            result[key] = b[key].concat(a[key]);
+            return;
+        }
         result[key] = [a[key], b[key]];
     });
     aRestKeys.forEach((key) => {
+        if (Array.isArray(a[key])) {
+            result[key] = a[key];
+            return;
+        }
         result[key] = [a[key]];
     });
     bRestKeys.forEach((key) => {
+        if (Array.isArray(b[key])) {
+            result[key] = b[key];
+            return;
+        }
         result[key] = [b[key]];
     });
     return result;
@@ -337,6 +356,7 @@ function mergeSameNameKey(a, b) {
 /**
  * 将多个 hooks 合并
  * @param  {...any} hooksGroup
+ * @param {Hooks} group
  */
 function mergeHooks(...hooksGroup) {
     return hooksGroup.reduce((group, hooks) => mergeSameNameKey(group, hooks), {});

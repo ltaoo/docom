@@ -26,6 +26,7 @@ const {
 } = require('react-dev-utils/WebpackDevServerUtils');
 const openBrowser = require('react-dev-utils/openBrowser');
 
+const babelConfigFacotry = require('../config/babelConfig');
 const pathsFactory = require('../config/paths');
 const configFactory = require('../config/webpack.config');
 const createDevServerConfig = require('../config/webpackDevServer.config');
@@ -72,18 +73,21 @@ module.exports = (argv) => {
         plugins: docomPlugins,
     } = docomConfig;
     const {
-        hooks: themeHooks,
-        plugins: themePlugins,
-    } = themeConfig;
-    const {
         hooks: entryHooks,
         plugins: entryPlugins,
     } = entryConfig;
+    const {
+        hooks: themeHooks,
+        plugins: themePlugins,
+    } = themeConfig;
 
     const mergedHooks = mergeHooks(docomHooks, entryHooks, themeHooks);
     const mergedPlugins = mergePlugins(docomPlugins, entryPlugins, themePlugins);
+
+    const babelConfig = babelConfigFacotry({ isEnvProduction: false });
     docom.config = {
         ...formattedConfig,
+        babelConfig,
         hooks: mergedHooks,
         plugins: mergedPlugins,
         paths,
@@ -138,11 +142,13 @@ module.exports = (argv) => {
             }
             const config = configFactory('development');
             config.resolve.alias.react = path.resolve(paths.entryModule, 'node_modules/react');
+            config.resolve.alias['react-dom'] = path.resolve(paths.entryModule, 'node_modules/react-dom');
             if (hooks.beforeCompile) {
                 hooks.beforeCompile.forEach((hook) => {
-                    hook(config);
+                    hook(config, docom);
                 });
             }
+            docom.config.webpackConfig = config;
             const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
             const appName = require(paths.appPackageJson).name;
             const useTypeScript = fs.existsSync(paths.appTsConfig);

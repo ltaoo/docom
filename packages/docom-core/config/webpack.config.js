@@ -25,7 +25,7 @@ const postcssNormalize = require('postcss-normalize');
 const pathsFacotry = require('./paths');
 // const modules = require('./modules');
 const getClientEnvironment = require('./env');
-
+const babelConfigFacotry = require('./babelConfig');
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
@@ -116,6 +116,8 @@ module.exports = (webpackEnv) => {
         }
         return loaders;
     };
+
+    const babelConfig = babelConfigFacotry({ isEnvProduction });
 
     return {
         mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
@@ -344,33 +346,7 @@ module.exports = (webpackEnv) => {
                                 paths.entryModule && fs.realpathSync(paths.entryModule),
                                 paths.theme && fs.realpathSync(paths.theme),
                             ].filter(Boolean),
-                            options: {
-                                customize: require.resolve(
-                                    'babel-preset-react-app/webpack-overrides',
-                                ),
-                                presets: [
-                                    [require.resolve('@babel/preset-react')],
-                                    [require.resolve('@babel/preset-env')],
-                                ],
-                                plugins: [
-                                    [
-                                        require.resolve('babel-plugin-named-asset-import'),
-                                        {
-                                            loaderMap: {
-                                                svg: {
-                                                    ReactComponent: '@svgr/webpack?-svgo,+ref![path]',
-                                                },
-                                            },
-                                        },
-                                    ],
-                                ],
-                                // This is a feature of `babel-loader` for webpack (not Babel itself).
-                                // It enables caching results in ./node_modules/.cache/babel-loader/
-                                // directory for faster rebuilds.
-                                // cacheDirectory: true,
-                                cacheCompression: isEnvProduction,
-                                compact: isEnvProduction,
-                            },
+                            options: babelConfig,
                         },
                         // Process any JS outside of the app with Babel.
                         // Unlike the application JS, we only compile the standard ES features.
@@ -470,12 +446,6 @@ module.exports = (webpackEnv) => {
                         {
                             test: /\.(md|markdown)$/,
                             loader: require.resolve('../loader'),
-                            options: {
-                                name: 'test',
-                                plugins: [
-                                    require.resolve('../loader/plugin'),
-                                ],
-                            },
                         },
                         {
                             loader: require.resolve('file-loader'),
