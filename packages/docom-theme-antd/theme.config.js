@@ -32,6 +32,7 @@ module.exports = {
         ['docom-plugin-toc', {
             maxDepth: 6,
         }],
+        ['docom-plugin-react'],
     ],
     hooks: {
         beforeCompile(webpackConfig) {
@@ -43,6 +44,8 @@ module.exports = {
                             r.loader
                             && r.loader.indexOf('bable-loader')
                             && Object.prototype.toString.call(r.test).includes('RegExp')
+                            && r.options
+                            && r.options.plugins
                         ) {
                             r.options.plugins.push([require.resolve('@babel/plugin-proposal-class-properties')]);
                         }

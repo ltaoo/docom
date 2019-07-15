@@ -95,10 +95,8 @@ export default class MainContent extends Component {
         const { history } = this.props;
         this.updatePage();
         this.listener = history.listen((route) => {
-            console.log(route.pathname, nkey);
             if (route.pathname !== nkey) {
                 NProgress.start();
-                console.log('change paget');
                 this.updatePage(route.pathname)
                     .then(() => {
                         NProgress.done();
@@ -135,7 +133,9 @@ export default class MainContent extends Component {
     }
 
     componentWillUnmount() {
-        this.scroller.disable();
+        if (this.scroller) {
+            this.scroller.disable();
+        }
         // this.listener.unlisten();
     }
 

@@ -7,6 +7,13 @@ import toReactComponent from 'jsonml-to-react-element';
 
 import config from '@root/docom.config';
 
+const converters = [
+    [
+        (node) => typeof node === 'function',
+        (node, index) => React.cloneElement(node(), { key: index }),
+    ],
+];
+
 export default class Article extends React.Component {
     static contextTypes = {
         intl: PropTypes.object.isRequired,
@@ -69,6 +76,7 @@ export default class Article extends React.Component {
                     {this.getArticle(
                         toReactComponent(
                             ['section', { className: 'markdown' }].concat(getChildren(content)),
+                            converters,
                         ),
                     )}
                     {toReactComponent(
