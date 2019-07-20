@@ -9,7 +9,7 @@ import config from '@root/docom.config';
 
 const converters = [
     [
-        (node) => typeof node === 'function',
+        node => typeof node === 'function',
         (node, index) => React.cloneElement(node(), { key: index }),
     ],
 ];

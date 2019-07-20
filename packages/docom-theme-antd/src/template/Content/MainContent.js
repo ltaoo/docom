@@ -11,6 +11,7 @@ import NProgress from 'nprogress';
 
 import LoadingPage from './LoadingPage';
 import Article from './Article';
+import ComponentDoc from './ComponentDoc';
 import PrevAndNext from './PrevAndNext';
 import NotFound from '../NotFound';
 import * as utils from '../utils';
@@ -86,6 +87,7 @@ export default class MainContent extends Component {
             openKeys: undefined,
             loading: true,
             content: null,
+            demos: [],
             nkey: null,
         };
     }
@@ -189,14 +191,17 @@ export default class MainContent extends Component {
     }
 
     updatePage = (path) => {
+        this.setState({
+            demos: [],
+        });
         // 这部分逻辑作为 collect 公共方法
         const { location: { pathname: prevPathname }, imports } = this.props;
         const pathname = path || prevPathname;
-        let paths = pathname.split('/').filter(Boolean);
+        const paths = pathname.split('/').filter(Boolean);
         let c = R.path(paths, imports);
         if (typeof c === 'object') {
-            paths = paths.concat('index');
-            c = R.path(paths, imports);
+            const indexPaths = paths.concat('index');
+            c = R.path(indexPaths, imports);
         }
         // @TODO  404 判断需要优化
         if (c === undefined && pathname !== '/') {
@@ -205,12 +210,25 @@ export default class MainContent extends Component {
             };
             return;
         }
+        // 获取 demos
+        let demos = null;
+        if (paths.includes('index')) {
+            const demoPaths = paths.filter(p => p !== 'index').concat('demo');
+            demos = R.path(demoPaths, imports);
+        }
+        // @TODO: 请求可以放一起
+        if (demos) {
+            Promise.all(Object.keys(demos).map(key => demos[key]()))
+                .then((results) => {
+                    this.setState({
+                        demos: results,
+                    });
+                });
+        }
         return c()
             .then((response) => {
                 this.setState({
-                    meta: response.meta,
-                    content: response.content,
-                    toc: response.toc,
+                    ...response,
                     markdownData: response,
                 });
             })
@@ -324,7 +342,7 @@ export default class MainContent extends Component {
     render() {
         const { props } = this;
         const {
-            loading, error, openKeys, meta, content, toc,
+            loading, error, openKeys, api, meta, content, toc, demos,
         } = this.state;
         const isInitial = content === null;
         if (error === 404) {
@@ -366,12 +384,17 @@ export default class MainContent extends Component {
                     </Col>
                     <Col xxl={20} xl={19} lg={18} md={24} sm={24} xs={24}>
                         <section className={mainContainerClass}>
-                            <Article
-                                {...props}
-                                content={content}
-                                meta={meta}
-                                toc={toc}
-                            />
+                            {demos ? (
+                                <ComponentDoc {...props} doc={{ content, meta, api }} demos={demos} />
+                            ) : (
+                                <Article
+                                    {...props}
+                                    content={content}
+                                    meta={meta}
+                                    api={api}
+                                    toc={toc}
+                                />
+                            )}
                         </section>
                         <PrevAndNext prev={prev} next={next} />
                     </Col>

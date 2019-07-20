@@ -32,7 +32,7 @@ module.exports = {
         ['docom-plugin-toc', {
             maxDepth: 6,
         }],
-        ['docom-plugin-react'],
+        ['docom-plugin-antd'],
     ],
     hooks: {
         beforeCompile(webpackConfig) {
