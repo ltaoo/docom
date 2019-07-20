@@ -66,6 +66,7 @@ const getSideBarOpenKeys = (nextProps) => {
     const shouldOpenKeys = utils
         .getMenuItems(moduleData, locale, themeConfig.categoryOrder, themeConfig.typeOrder)
         .map(m => (m.title && m.title[locale]) || m.title);
+    console.log(shouldOpenKeys);
     return shouldOpenKeys;
 };
 
@@ -117,9 +118,11 @@ export default class MainContent extends Component {
             document.documentElement.scrollTop = 0;
         }
         // when subMenu not equal
-        if (get(this.props, 'route.path') !== get(prevProps, 'route.path')) {
+        const pathnameKeys = 'location.pathname';
+        if (get(this.props, pathnameKeys) !== get(prevProps, pathnameKeys)) {
+            const keys = getSideBarOpenKeys(this.props);
             // reset menu OpenKeys
-            this.handleMenuOpenChange();
+            this.handleMenuOpenChange(keys);
         }
         setTimeout(() => {
             if (!window.location.hash) {
@@ -193,6 +196,8 @@ export default class MainContent extends Component {
     updatePage = (path) => {
         this.setState({
             demos: [],
+            // content: [],
+            // api: [],
         });
         // 这部分逻辑作为 collect 公共方法
         const { location: { pathname: prevPathname }, imports } = this.props;
@@ -384,7 +389,7 @@ export default class MainContent extends Component {
                     </Col>
                     <Col xxl={20} xl={19} lg={18} md={24} sm={24} xs={24}>
                         <section className={mainContainerClass}>
-                            {demos ? (
+                            {(demos && demos.length) ? (
                                 <ComponentDoc {...props} doc={{ content, meta, api }} demos={demos} />
                             ) : (
                                 <Article
