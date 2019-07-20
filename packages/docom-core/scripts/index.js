@@ -5,41 +5,41 @@ const docom = {
     config: {},
 };
 Object.defineProperty(global, 'docom', {
-  enumerable: true,
-  writable: false,
-  value: docom,
+    enumerable: true,
+    writable: false,
+    value: docom,
 });
 
 const dev = require('./start');
 const build = require('./build');
 
 module.exports = {
-    cli: () => {
-        return yargs
-            .command(
-                'dev', 'initialize docom dev server', (yargs) => {
+    cli: () => yargs
+        .command(
+            'dev', 'initialize docom dev server', () => {
             }, (argv) => {
-                dev();
-            })
-            .option('config', {
-                alias: 'c',
-            })
-            .option('verbose', {
-                alias: 'v',
-                default: false,
-            })
-            .command(
-                'build', 'bundle', (yargs) => {
+                dev(argv);
+            },
+        )
+        .option('config', {
+            alias: 'c',
+        })
+        .option('verbose', {
+            alias: 'v',
+            default: false,
+        })
+        .command(
+            'build', 'bundle', () => {
             }, (argv) => {
-                build();
-            })
-            .option('config', {
-                alias: 'c',
-            })
-            .option('verbose', {
-                alias: 'v',
-                default: false,
-            })
-            .argv;
-    },
+                build(argv);
+            },
+        )
+        .option('config', {
+            alias: 'c',
+        })
+        .option('verbose', {
+            alias: 'v',
+            default: false,
+        })
+        .argv,
 };

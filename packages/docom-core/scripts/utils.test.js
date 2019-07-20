@@ -15,35 +15,79 @@ describe('utils', () => {
         const result = utils.format(config);
 
         expect(result).toEqual({
+            entryType: 'react',
             files: ['**/*.md'],
             modules: [
                 {
                     key: 'develop',
                     title: '开发文档',
                     path: './docs/develop',
-                    absolutePath: '/Users/ltaoo/Documents/fake-bisheng/docs/develop',
+                    absolutePath: '/Users/ltaoo/Documents/fake-bisheng/packages/docom-core/docs/develop',
                 },
             ],
-        })
+            output: '_docom',
+            title: 'Docom',
+            plugins: [],
+            hooks: {},
+        });
     });
 
-    it('filesToTreeStructure', () => {
-        const files = [
-            'docs/develop/index.md',
-            'docs/develop/test.md',
-            'docs/develop/branch.md',
-        ];
-        const sources = ['./docs/develop'];
+    describe('filesToTreeStructure', () => {
+        it('one level dirs', () => {
+            const files = [
+                'docs/develop/index.md',
+                'docs/develop/test.md',
+                'docs/develop/branch.md',
+            ];
+            const sources = ['./docs/develop'];
 
-        const result = utils.filesToTreeStructure(files, sources);
-        expect(result).toEqual({
-            docs: {
-                develop: {
-                    index: 'docs/develop/index.md',
-                    test: 'docs/develop/test.md',
-                    branch: 'docs/develop/branch.md',
+            const result = utils.filesToTreeStructure(files, sources);
+            expect(result).toEqual({
+                docs: {
+                    develop: {
+                        index: 'docs/develop/index.md',
+                        test: 'docs/develop/test.md',
+                        branch: 'docs/develop/branch.md',
+                    },
                 },
-            },
+            });
+        });
+        it('rec dirs', () => {
+            const files = [
+                'docs/develop/index.md',
+                'docs/develop/test.md',
+                'docs/develop/branch.md',
+                'src/components/index.md',
+                'src/components/button/index.md',
+                'src/components/button/demo/index.md',
+                'src/components/input/index.md',
+            ];
+            const sources = ['./docs/develop', './src/components'];
+
+            const result = utils.filesToTreeStructure(files, sources);
+            expect(result).toEqual({
+                docs: {
+                    develop: {
+                        index: 'docs/develop/index.md',
+                        test: 'docs/develop/test.md',
+                        branch: 'docs/develop/branch.md',
+                    },
+                },
+                src: {
+                    components: {
+                        index: 'src/components/index.md',
+                        button: {
+                            index: 'src/components/button/index.md',
+                            demo: {
+                                index: 'src/components/button/demo/index.md',
+                            },
+                        },
+                        input: {
+                            index: 'src/components/input/index.md',
+                        },
+                    },
+                },
+            });
         });
     });
 
@@ -115,7 +159,7 @@ describe('utils', () => {
                 test: '{{@root/docs/develop/test.md}}',
                 branch: '{{@root/docs/develop/branch.md}}',
             },
-        }; 
+        };
         const expectResult = `module.exports = {
   "develop": {
     "index": () => import('@root/docs/develop/index.md'),
@@ -127,5 +171,93 @@ describe('utils', () => {
         const result = utils.createImportsContent(modules);
 
         expect(result).toEqual(expectResult);
+    });
+
+    it('normalizeFilePath', () => {
+        const config = {
+            files: ['**/*.md'],
+            modules: {
+                develop: {
+                    title: '开发文档',
+                    path: './docs/develop',
+                },
+                components: {
+                    title: '組件',
+                    path: './src/components',
+                },
+            },
+        };
+        const filename = 'src/components/index.md';
+
+        const formatedConfig = utils.format(config);
+        const result = utils.normalizeFilePath(filename, formatedConfig.modules);
+
+        expect(result).toBe('components/index.md');
+    });
+
+    it('mergeSameNameKey', () => {
+        const a = {
+            foo: 2,
+            bar: 'bar',
+        };
+        const b = {
+            foo: 5,
+        };
+
+        const result = utils.mergeSameNameKey(a, b);
+
+        expect(result).toEqual({
+            foo: [2, 5],
+            bar: ['bar'],
+        });
+    });
+
+    describe('mergeHooks', () => {
+        it('normal', () => {
+            const config = {
+                hooks: {
+                    beforeCompile: 1,
+                },
+            };
+            const entryConfig = {
+                hooks: {
+                    beforeCompile: 2,
+                },
+            };
+            const themeConfig = {
+                hooks: {
+                    beforeCompile: 3,
+                },
+            };
+
+            const result = utils.mergeHooks(config.hooks, entryConfig.hooks, themeConfig.hooks);
+
+            expect(result).toEqual({
+                beforeCompile: [1, 2, 3],
+            });
+        });
+
+        it('empty', () => {
+            const config = {
+                hooks: {
+                    beforeCompile: 1,
+                },
+            };
+            const entryConfig = {
+                hooks: {
+                },
+            };
+            const themeConfig = {
+                hooks: {
+                    beforeCompile: 3,
+                },
+            };
+
+            const result = utils.mergeHooks(config.hooks, entryConfig.hooks, themeConfig.hooks);
+
+            expect(result).toEqual({
+                beforeCompile: [1, 3],
+            });
+        });
     });
 });
