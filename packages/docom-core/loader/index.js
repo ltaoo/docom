@@ -1,11 +1,13 @@
 const marktwain = require('mark-twain');
-// const loaderUtils = require("loader-utils");
 
 const stringify = require('./stringify');
 
-module.exports = (content) => {
-    // const options = loaderUtils.getOptions(this);
-    const markdownData = marktwain(content);
+module.exports = function loader(content) {
+    const filepath = this.resourcePath;
+    const module = docom.config.modules.find(m => filepath.includes(m.absolutePath));
+    const filename = filepath.replace(module.absolutePath, module.key);
+    let markdownData = marktwain(content);
+    markdownData.meta.filename = filename;
     const { config } = docom;
 
     // 可以对 markdown data 做修改
@@ -14,6 +16,8 @@ module.exports = (content) => {
         if (plugin === undefined) {
             return;
         }
+        // @TODO: 增加 log 展示加载了哪些 plugin
+        // console.log(plugin, [config.paths.theme, config.paths.entry]);
         const util = require(require.resolve(plugin, {
             paths: [
                 config.paths.theme,
@@ -22,7 +26,7 @@ module.exports = (content) => {
         }));
         const { hooks } = util;
         if (hooks && hooks.modifyMarkdownData) {
-            hooks.modifyMarkdownData(markdownData, {
+            markdownData = hooks.modifyMarkdownData(markdownData, {
                 ...docom,
                 ...opt,
             });

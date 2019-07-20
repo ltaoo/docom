@@ -258,6 +258,7 @@ function normalizeFilePath(filepath, sources) {
 
 /**
  * 生成 source.json 文件
+ * TODO 这个函数要拿出来单独作为模块
  * @param {FileTree} fileTree
  * @param {FormattedDocomConfig} config
  */
@@ -266,7 +267,8 @@ function createSourceFile(fileTree, config) {
     const content = processRelativePath(fileTree)((relativePath) => {
         const absolutePath = path.resolve(cwd, relativePath);
         // @TODO 这里应该很耗性能，不仅要读取文件，还要解析。需要优化
-        const markdownData = marktwain(fs.readFileSync(absolutePath, 'utf-8'));
+        const fileContent = fs.readFileSync(absolutePath, 'utf-8');
+        let markdownData = marktwain(fileContent);
         markdownData.meta.realpath = relativePath;
         markdownData.meta.filename = normalizeFilePath(relativePath, config.modules);
 
@@ -284,7 +286,7 @@ function createSourceFile(fileTree, config) {
             }));
             const { hooks } = util;
             if (hooks && hooks.modifyMarkdownData) {
-                hooks.modifyMarkdownData(markdownData, {
+                markdownData = hooks.modifyMarkdownData(markdownData, {
                     ...docom,
                     ...opt,
                 });
