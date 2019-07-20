@@ -11,21 +11,6 @@ subtitle: 按钮
 
 标记了一个（或封装一组）操作命令，响应用户点击行为，触发相应的业务逻辑。
 
-```jsx
-import { Button } from 'antd';
-
-ReactDOM.render(
-  <div>
-    <Button type="primary">Primary</Button>
-    <Button>Default</Button>
-    <Button type="dashed">Dashed</Button>
-    <Button type="danger">Danger</Button>
-    <Button type="link">Link</Button>
-  </div>,
-  mountNode,
-);
-```
-
 ## API
 
 通过设置 Button 的属性来产生不同的按钮样式，推荐顺序为：`type` -> `shape` -> `size` -> `loading` -> `disabled`。
@@ -59,3 +44,12 @@ ReactDOM.render(
 
 设置 [ConfigProvider](/components/config-provider/#API) 的 `autoInsertSpaceInButton` 为 `false`。
 
+<style>
+[id^="components-button-demo-"] .ant-btn {
+  margin-right: 8px;
+  margin-bottom: 12px;
+}
+[id^="components-button-demo-"] .ant-btn-group > .ant-btn {
+  margin-right: 0;
+}
+</style>

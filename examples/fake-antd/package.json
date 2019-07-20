@@ -20,5 +20,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "dependencies": {
+    "antd": "^3.20.3"
   }
 }

@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
     title: 'E5',
     subtitle: 'https://gw.alipayobjects.com/zos/rmsportal/DkKNubTaaVsKURhcVGkh.svg',
@@ -14,4 +16,11 @@ module.exports = {
             path: './docs/develop',
         },
     },
+    hooks: {
+        beforeCompile(webpackConfig) {
+            /* eslint-disable no-param-reassign */
+            webpackConfig.resolve.alias.antd = path.resolve('./node_modules/antd');
+        },
+    },
+    plugins: [],
 };

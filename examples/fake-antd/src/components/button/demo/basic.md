@@ -1,6 +1,8 @@
 ---
 order: 0
-title: 按钮类型
+title:
+  zh-CN: 按钮类型
+  en-US: Type
 ---
 
 ## zh-CN
