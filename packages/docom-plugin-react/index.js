@@ -32,7 +32,7 @@ function transform(markdownData, { config }) {
 module.exports = {
     hooks: {
         modifyMarkdownData(markdownData, config) {
-            transform(markdownData, config);
+            return transform(markdownData, config);
         },
     },
 };

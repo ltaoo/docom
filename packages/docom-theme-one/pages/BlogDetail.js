@@ -28,7 +28,7 @@ export default class DetailItem extends React.Component {
                     loading: false,
                 });
             });
-        
+
         this.state = {
             loading: true,
             content: [],
@@ -37,7 +37,9 @@ export default class DetailItem extends React.Component {
     }
 
     render() {
-        const { loading, content, description = '', meta } = this.state;
+        const {
+            loading, content, description = '', meta,
+        } = this.state;
         if (loading) {
             return <p>Loading...</p>;
         }

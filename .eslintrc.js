@@ -16,10 +16,10 @@ module.exports = {
         'react',
     ],
     globals: {
-        describe: 'read-only',
-        expect: 'read-only',
-        it: 'read-only',
-        docom: 'read-only',
+        describe: 'readonly',
+        expect: 'readonly',
+        it: 'readonly',
+        docom: 'readonly',
     },
     // settings: {
     //     'import/resolver': {
@@ -30,6 +30,7 @@ module.exports = {
     // },
     rules: {
         indent: [2, 4],
+        'no-console': [0],
         'react/jsx-filename-extension': [0],
         'react/jsx-indent': [0, 4, { props: 4 }],
         'react/jsx-indent-props': [2, 4],
