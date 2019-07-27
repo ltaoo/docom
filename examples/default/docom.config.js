@@ -1,5 +1,6 @@
 module.exports = {
   files: ['**/*.md'],
+  theme: 'docom-theme-one',
   modules: {
     blog: {
       title: '博客',
