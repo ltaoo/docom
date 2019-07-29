@@ -66,7 +66,6 @@ const getSideBarOpenKeys = (nextProps) => {
     const shouldOpenKeys = utils
         .getMenuItems(moduleData, locale, themeConfig.categoryOrder, themeConfig.typeOrder)
         .map(m => (m.title && m.title[locale]) || m.title);
-    console.log(shouldOpenKeys);
     return shouldOpenKeys;
 };
 

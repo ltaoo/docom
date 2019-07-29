@@ -10,14 +10,15 @@ Object.defineProperty(global, 'docom', {
     value: docom,
 });
 
-const dev = require('./start');
-const build = require('./build');
-
 module.exports = {
     cli: () => yargs
         .command(
             'dev', 'initialize docom dev server', () => {
             }, (argv) => {
+                if (argv.verbose) {
+                    process.env.DEBUG = 'core:*,plugin:*';
+                }
+                const dev = require('./start');
                 dev(argv);
             },
         )
@@ -26,11 +27,13 @@ module.exports = {
         })
         .option('verbose', {
             alias: 'v',
+            type: 'boolean',
             default: false,
         })
         .command(
             'build', 'bundle', () => {
             }, (argv) => {
+                const build = require('./build');
                 build(argv);
             },
         )

@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 
+const debug = require('debug')('core:log');
 const marktwain = require('mark-twain');
 const R = require('ramda');
 const glob = require('glob');
@@ -245,6 +246,7 @@ function removePrefixPath(pathname) {
  * @param {Array<string>} sources
  */
 function normalizeFilePath(filepath, sources) {
+    debug('normalize file path', filepath);
     const source = sources.find((s) => {
     // @TODO 可能有平台差异
         const pathname = removePrefixPath(s.path);
