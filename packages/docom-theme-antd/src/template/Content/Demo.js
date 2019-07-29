@@ -86,7 +86,6 @@ export default class Demo extends React.Component {
   render() {
       const { state } = this;
       const { props } = this;
-      console.log(props);
       const {
           meta, preview, content, highlightedCode, style, highlightedStyle, expand,
       } = props;
@@ -112,7 +111,6 @@ export default class Demo extends React.Component {
       });
 
       const sourceCode = this.getSourceCode();
-      console.log(sourceCode);
 
       return (
           <section className={codeBoxClass} id={meta.id}>

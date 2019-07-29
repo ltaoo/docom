@@ -91,7 +91,6 @@ module.exports = ({
     }
 
     const sourceCodeObject = getSourceCodeObject(contentChildren, codeIndex);
-    console.log('sourceCodeObject', sourceCodeObject, contentChildren);
     if (sourceCodeObject.isES6) {
         markdownData.highlightedCode = contentChildren[codeIndex].slice(0, 3);
         markdownData.highlightedCodes = getHighlightCodes(sourceCodeObject);

@@ -10,11 +10,9 @@ export default class DetailItem extends React.Component {
 
         const { location: { pathname }, imports } = props;
         const paths = pathname.split('/').filter(Boolean);
-        console.log(pathname);
         const c = R.path(paths, imports);
         c()
             .then((response) => {
-                console.log(response);
                 this.setState({
                     meta: response.meta,
                     content: response.content,

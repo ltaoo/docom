@@ -11,6 +11,7 @@ process.on('unhandledRejection', (err) => {
 
 require('../config/env');
 
+const debug = require('debug')('core:log');
 const fs = require('fs');
 const path = require('path');
 const chalk = require('react-dev-utils/chalk');
@@ -53,7 +54,7 @@ const DEFAULT_DOCOM_CONFIG_FILENAME = 'docom.config';
  * @param {Argv} argv
  */
 module.exports = (argv) => {
-    console.log(argv);
+    debug('CLI Options:', argv);
     const docomConfig = require(path.resolve(process.cwd(), DEFAULT_DOCOM_CONFIG_FILENAME));
     if (validateConfig(docomConfig)) {
         process.exit(1);
@@ -110,7 +111,6 @@ module.exports = (argv) => {
     // Tools like Cloud9 rely on this.
     const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
     const HOST = process.env.HOST || '0.0.0.0';
-
     if (process.env.HOST) {
         console.log(
             chalk.cyan(
@@ -153,6 +153,7 @@ module.exports = (argv) => {
             const appName = require(paths.appPackageJson).name;
             const useTypeScript = fs.existsSync(paths.appTsConfig);
             const urls = prepareUrls(protocol, HOST, port);
+            debug('port:', urls);
             /* eslint-disable no-use-before-define */
             const devSocket = {
                 warnings: warnings => devServer.sockWrite(devServer.sockets, 'warnings', warnings),
