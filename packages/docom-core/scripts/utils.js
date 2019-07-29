@@ -77,7 +77,7 @@ function toMatch(conf) {
 
 function getPropPath(filename, sources) {
     return sources.reduce(
-        f => f,
+        f => f.split(path.sep).join('/'),
         // (f, source) => f.replace(source.path, source.key),
         filename.replace(new RegExp(`${path.extname(filename)}$`), ''),
     ).replace(/^\.?(?:\\|\/)+/, '').split('/');
