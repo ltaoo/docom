@@ -1,3 +1,5 @@
+const log = require('debug')('plugin:log');
+
 module.exports = {
     categoryOrder: {
         'Ant Design': 0,
@@ -38,6 +40,7 @@ module.exports = {
         beforeCompile(webpackConfig) {
             /* eslint-disable no-param-reassign */
             webpackConfig.module.rules = webpackConfig.module.rules.map((rule) => {
+                log('set rules');
                 if (rule.oneOf) {
                     rule.oneOf = rule.oneOf.map((r) => {
                         if (

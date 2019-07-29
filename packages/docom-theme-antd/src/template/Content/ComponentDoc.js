@@ -74,7 +74,6 @@ export default class ComponentDoc extends React.Component {
                   rightChildren.push(demoElem);
               }
           });
-      console.log(showedDemo, leftChildren, rightChildren);
       const expandTriggerClass = classNames({
           'code-box-expand-trigger': true,
           'code-box-expand-trigger-active': expandAll,
