@@ -7,6 +7,10 @@ module.exports = {
     theme: 'docom-theme-antd',
     files: ['**/*.md'],
     modules: {
+        index: {
+            title: '首页',
+            path: 'index.md',
+        },
         components: {
             title: '組件',
             path: './src/components',

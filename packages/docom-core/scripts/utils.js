@@ -54,6 +54,14 @@ const globConfig = {
     matchBase: true,
 };
 
+function hasSuffix(filepath) {
+    const ext = path.extname(filepath);
+    if (ext !== '' && ext !== undefined) {
+        return true;
+    }
+    return false;
+}
+
 /**
  * 从项目中递归获取指定文件
  * @param {string} module
@@ -62,8 +70,11 @@ const globConfig = {
  */
 function collectFiles(module, files) {
     const { path: modulePath } = module;
-    const searchPath = path.resolve(modulePath);
-    return glob.sync(files, { ...globConfig, cwd: searchPath });
+    if (!hasSuffix(modulePath)) {
+        const searchPath = path.resolve(modulePath);
+        return glob.sync(files, { ...globConfig, cwd: searchPath });
+    }
+    return [modulePath];
 }
 
 function toMatch(conf) {
@@ -101,6 +112,7 @@ function filesToTreeStructure(filenames, sources) {
 }
 
 /**
+ * glob 遍历后，把得到的 markdown 文件名和路径拼起来
  * @param {ModuleConfig} module
  * @param {Array<FileName>} files - glob 查找到的文件名
  * @return {Modules}
@@ -108,14 +120,17 @@ function filesToTreeStructure(filenames, sources) {
 function getLastFileTree(module, files) {
     const { key, path: modulePath } = module;
     const removedPrefixModulePath = path.join(modulePath);
-    const prefixedFiles = files
-        .map(file => path.join(removedPrefixModulePath, file));
-
+    const prefixedFiles = !hasSuffix(modulePath)
+        ? files.map(file => path.join(removedPrefixModulePath, file))
+        : files;
     const fileTree = filesToTreeStructure(prefixedFiles, [removedPrefixModulePath]);
     const modulePaths = removedPrefixModulePath.split(path.sep).join('.');
-    return {
-        [key]: _.get(fileTree, modulePaths),
-    };
+    if (!hasSuffix(modulePath)) {
+        return {
+            [key]: _.get(fileTree, modulePaths),
+        };
+    }
+    return fileTree;
 }
 
 /**
