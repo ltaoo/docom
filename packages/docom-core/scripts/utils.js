@@ -101,7 +101,7 @@ function filesToTreeStructure(filenames, sources) {
 }
 
 /**
- * @param {ModuleConfig} module
+????
  * @param {Array<FileName>} files - glob 查找到的文件名
  * @return {Modules}
  */
@@ -363,10 +363,10 @@ function mergeSameNameKey(a, b) {
  * @param {Hooks} group
  */
 function mergeHooks(...hooksGroup) {
-    return hooksGroup.reduce((group, hooks) => mergeSameNameKey(group, hooks), {});
+    return hooksGroup.filter(Boolean).reduce((group, hooks) => mergeSameNameKey(group, hooks), {});
 }
 function mergePlugins(...pluginsGroup) {
-    return pluginsGroup.reduce((group, plugins) => group.concat(plugins), []);
+    return pluginsGroup.filter(Boolean).reduce((group, plugins) => group.concat(plugins), []);
 }
 
 module.exports = {

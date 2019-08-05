@@ -45,11 +45,6 @@ export default class DetailItem extends React.Component {
         return (
             <div className="content">
                 <h1 className="content__title">{title}</h1>
-                <div className="content__description">
-                    <section>
-                        <p>{description}</p>
-                    </section>
-                </div>
                 <div className="content__container">
                     <article>{toReactElement(content)}</article>
                 </div>

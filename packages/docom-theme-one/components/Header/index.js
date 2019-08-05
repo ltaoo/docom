@@ -17,12 +17,6 @@ export default class Header extends React.Component {
                             className="header__link"
                             href="/"
                         >{site}</a>
-                        {title && (
-                            <span>
-                                -
-                                <span className="header__tagline">{title}</span>
-                            </span>
-                        )}
                     </div>
                 </div>
             </header>
