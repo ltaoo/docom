@@ -48,11 +48,9 @@ export default class Demo extends React.Component {
   getSourceCode() {
       const { highlightedCode } = this.props;
       if (typeof document !== 'undefined') {
-          //   const div = document.createElement('div');
-          //   console.log(highlightedCode);
-          //   div.innerHTML = highlightedCode[2][1];
-          //   return div.textContent;
-          return highlightedCode[2][1];
+          const div = document.createElement('div');
+          div.innerHTML = highlightedCode[1].highlighted;
+          return div.textContent;
       }
       return '';
   }

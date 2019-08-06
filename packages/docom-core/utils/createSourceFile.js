@@ -39,7 +39,7 @@ function createSourceFile(modules, config) {
                 const { hooks } = util;
                 if (hooks && hooks.modifyMarkdownData) {
                     markdownData = hooks.modifyMarkdownData(markdownData, {
-                        ...docom,
+                        ...config,
                         ...opt,
                     });
                 }

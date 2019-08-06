@@ -74,6 +74,7 @@ module.exports = () => {
         docomConfig.files,
     );
     createSourceFile(modulesWithFileTree, {
+        babelConfig,
         lazyload: docomConfig.lazyload,
         paths,
         plugins: mergedPlugins,
