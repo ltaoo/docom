@@ -36,7 +36,7 @@ export default class DetailItem extends React.Component {
 
     render() {
         const {
-            loading, content, description = '', meta,
+            loading, content, meta,
         } = this.state;
         if (loading) {
             return <p>Loading...</p>;

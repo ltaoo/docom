@@ -8,7 +8,7 @@ export default class Header extends React.Component {
     }
 
     render() {
-        const { site, title } = this.props;
+        const { site } = this.props;
         return (
             <header className="header">
                 <div className="header__container">

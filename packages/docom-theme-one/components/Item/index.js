@@ -7,7 +7,7 @@ import './index.css';
 
 export default class Item extends React.Component {
     render() {
-        const { title, date, link, summary = '' } = this.props;
+        const { title, date, link } = this.props;
 
         return (
             <div className="item">
