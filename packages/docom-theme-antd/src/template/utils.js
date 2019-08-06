@@ -1,3 +1,7 @@
+import React from 'react';
+import * as R from 'ramda';
+
+import LoadingPage from './Content/LoadingPage';
 /**
  * MarkdownData : {
  *  meta: {
@@ -20,6 +24,7 @@ export function getMenuItems(moduleData, locale, categoryOrder, typeOrder) {
     const menuMeta = moduleData.map(item => ({
         ...item.meta,
     }));
+
     const menuItems = [];
     const sortFn = (a, b) => (a.order || 0) - (b.order || 0);
     menuMeta.sort(sortFn).forEach((meta) => {
@@ -100,4 +105,58 @@ export function isLocalStorageNameSupported() {
     } catch (error) {
         return false;
     }
+}
+
+export function withMarkdown(paths) {
+    return (Component) => {
+        class Wrapper extends React.Component {
+            constructor(props) {
+                super(props);
+
+                this.state = {
+                    loading: true,
+                    content: [],
+                };
+            }
+
+            componentDidMount() {
+                this.updatePage();
+            }
+
+            updatePage = () => {
+                const { imports } = this.props;
+                let c = R.path(paths, imports);
+                if (typeof c === 'object') {
+                    const indexPaths = paths.concat('index');
+                    c = R.path(indexPaths, imports);
+                }
+                if (typeof c !== 'function') {
+                    return;
+                }
+                c()
+                    .then((res) => {
+                        this.setState({
+                            content: res.content,
+                        });
+                    })
+                    .finally(() => {
+                        this.setState({
+                            loading: false,
+                        });
+                    });
+            }
+
+            render() {
+                const { loading, content } = this.state;
+                if (loading === true) {
+                    return <LoadingPage />;
+                }
+                return (
+                    <Component content={content} {...this.props} />
+                );
+            }
+        }
+
+        return Wrapper;
+    };
 }

@@ -99,10 +99,14 @@ export default class MainContent extends Component {
         this.listener = history.listen((route) => {
             if (route.pathname !== nkey) {
                 NProgress.start();
-                this.updatePage(route.pathname)
-                    .then(() => {
+                const p = this.updatePage(route.pathname);
+                if (p) {
+                    p.then(() => {
                         NProgress.done();
                     });
+                } else {
+                    NProgress.done();
+                }
             }
         });
     }
@@ -140,7 +144,9 @@ export default class MainContent extends Component {
         if (this.scroller) {
             this.scroller.disable();
         }
-        // this.listener.unlisten();
+        if (this.listener) {
+            // this.listener.unlisten();
+        }
     }
 
     /**

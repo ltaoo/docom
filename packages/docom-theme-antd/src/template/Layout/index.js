@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import 'moment/locale/zh-cn';
 import { LocaleProvider } from 'antd';
@@ -8,6 +8,7 @@ import 'antd/dist/antd.css';
 
 import themeConfig from '@theme/theme.config';
 
+import Home from '../Content/Home';
 import Header from './Header';
 import MainContent from '../Content/MainContent';
 import NotFound from '../NotFound';
@@ -40,8 +41,15 @@ export default class BasicLayout extends React.Component {
                     <div className="page-wrapper">
                         <Header {...restProps} />
                         <Switch>
+                            <Route
+                                path="/index"
+                                render={props => (
+                                    <Home {...props} {...this.props} />
+                                )}
+                            />
                             {modules.map(module => (
                                 <Route
+                                    key={module}
                                     path={`/${module}`}
                                     render={(props) => {
                                         const { pathname } = props.location;
@@ -56,6 +64,7 @@ export default class BasicLayout extends React.Component {
                                     }}
                                 />
                             ))}
+                            <Redirect from="/" to="/index" />
                             <Route path="/404" component={NotFound} />
                             <Route component={NotFound} />
                         </Switch>

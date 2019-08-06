@@ -27,21 +27,10 @@ const {
 } = require('react-dev-utils/WebpackDevServerUtils');
 const openBrowser = require('react-dev-utils/openBrowser');
 
-const babelConfigFacotry = require('../config/babelConfig');
-const pathsFactory = require('../config/paths');
 const configFactory = require('../config/webpack.config');
 const createDevServerConfig = require('../config/webpackDevServer.config');
-const {
-    validateConfig,
-    format,
-    getFileTree,
-    createImportsFile,
-    createSourceFile,
-    mergeHooks,
-    mergePlugins,
-} = require('./utils');
 
-const DEFAULT_DOCOM_CONFIG_FILENAME = 'docom.config';
+const init = require('./init');
 
 /**
  * interface Command = 'dev' | 'build' | 'deploy';
@@ -55,50 +44,8 @@ const DEFAULT_DOCOM_CONFIG_FILENAME = 'docom.config';
  */
 module.exports = (argv) => {
     debug('CLI Options:', argv);
-    const docomConfig = require(path.resolve(process.cwd(), DEFAULT_DOCOM_CONFIG_FILENAME));
-    if (validateConfig(docomConfig)) {
-        process.exit(1);
-    }
-    const formattedConfig = format(docomConfig);
-    const paths = pathsFactory({ config: formattedConfig, from: 'start' });
 
-    const { theme, entry } = paths;
-    const themeConfig = require(path.resolve(theme, 'theme.config'));
-    const entryConfig = require(path.resolve(entry, 'entry.config'));
-    if (themeConfig === undefined) {
-        console.log('主题中必须包含 theme.config.js 文件');
-        process.exit(1);
-    }
-    const {
-        hooks: docomHooks,
-        plugins: docomPlugins,
-    } = docomConfig;
-    const {
-        hooks: entryHooks,
-        plugins: entryPlugins,
-    } = entryConfig;
-    const {
-        hooks: themeHooks,
-        plugins: themePlugins,
-    } = themeConfig;
-
-    const mergedHooks = mergeHooks(docomHooks, entryHooks, themeHooks);
-    const mergedPlugins = mergePlugins(docomPlugins, entryPlugins, themePlugins);
-
-    const babelConfig = babelConfigFacotry({ isEnvProduction: false });
-    docom.config = {
-        ...formattedConfig,
-        babelConfig,
-        hooks: mergedHooks,
-        plugins: mergedPlugins,
-        paths,
-    };
-
-    const hooks = mergedHooks;
-
-    const fileTree = getFileTree(formattedConfig.modules, formattedConfig.files);
-    createSourceFile(fileTree, docom.config);
-    createImportsFile(fileTree, docom.config);
+    const { paths, hooks } = init();
 
     const useYarn = fs.existsSync(paths.yarnLockFile);
     const isInteractive = process.stdout.isTTY;
@@ -140,7 +87,7 @@ module.exports = (argv) => {
                 // We have not found a port.
                 return;
             }
-            const config = configFactory('development');
+            const config = configFactory('development', paths);
             config.resolve.alias.react = path.resolve(paths.entryModule, 'node_modules/react');
             config.resolve.alias['react-dom'] = path.resolve(paths.entryModule, 'node_modules/react-dom');
             if (hooks.beforeCompile) {
@@ -153,7 +100,6 @@ module.exports = (argv) => {
             const appName = require(paths.appPackageJson).name;
             const useTypeScript = fs.existsSync(paths.appTsConfig);
             const urls = prepareUrls(protocol, HOST, port);
-            debug('port:', urls);
             /* eslint-disable no-use-before-define */
             const devSocket = {
                 warnings: warnings => devServer.sockWrite(devServer.sockets, 'warnings', warnings),

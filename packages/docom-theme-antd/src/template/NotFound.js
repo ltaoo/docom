@@ -1,6 +1,7 @@
-/* eslint-disable react/no-danger */
 import React from 'react';
 import { Link } from 'react-router-dom';
+
+/* eslint-disable react/no-danger */
 
 export default class NotFound extends React.Component {
     shouldComponentUpdate() {
@@ -13,7 +14,7 @@ export default class NotFound extends React.Component {
                 <section>
                     <h1>404</h1>
                     <p>
-                    你要找的页面不存在
+                        你要找的页面不存在
                         <Link to="/">返回首页</Link>
                     </p>
                 </section>
