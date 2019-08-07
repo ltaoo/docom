@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const marktwain = require('mark-twain');
+const log = require('debug')('core:log');
 
 const walkFileTree = require('./walkFileTree');
 const normalizeFilePath = require('./normalizeFilePath');
@@ -25,15 +26,17 @@ function createSourceFile(modules, config) {
             markdownData.meta.filename = normalizeFilePath(relativePath, module);
 
             // 可以对 markdown data 做修改
-            const { plugins } = config;
+            const { plugins, paths } = config;
             plugins.forEach(([plugin, opt = {}]) => {
                 if (plugin === undefined) {
                     return;
                 }
+                log('plugin', plugin);
+                log('plugin search path', paths.theme, paths.entry);
                 const util = require(require.resolve(plugin, {
                     paths: [
-                        config.paths.theme,
-                        config.paths.entry,
+                        paths.theme,
+                        paths.entry,
                     ],
                 }));
                 const { hooks } = util;
