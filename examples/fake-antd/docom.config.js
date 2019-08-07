@@ -6,9 +6,14 @@ module.exports = {
     logo: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
     theme: 'docom-theme-antd',
     files: ['**/*.md'],
+    lazyload: true,
     modules: {
+        index: {
+            title: '首页',
+            path: 'README.md',
+        },
         components: {
-            title: '組件',
+            title: '组件',
             path: './src/components',
         },
         develop: {

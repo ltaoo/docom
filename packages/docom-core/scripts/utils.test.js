@@ -52,6 +52,17 @@ describe('utils', () => {
                 },
             });
         });
+        it('file', () => {
+            const files = [
+                'index.md',
+            ];
+            const sources = ['index'];
+
+            const result = utils.filesToTreeStructure(files, sources);
+            expect(result).toEqual({
+                index: 'index.md',
+            });
+        });
         it('rec dirs', () => {
             const files = [
                 'docs/develop/index.md',
@@ -108,6 +119,21 @@ describe('utils', () => {
                 test: 'docs/develop/test.md',
                 branch: 'docs/develop/branch.md',
             },
+        });
+    });
+    it('file', () => {
+        const moduleConfig = {
+            key: 'index',
+            title: '首页',
+            path: 'index.md',
+            absolutePath: '/Users/ltaoo/Documents/fake-bisheng/README.md',
+        };
+        const files = ['index.md'];
+
+        const result = utils.getLastFileTree(moduleConfig, files);
+
+        expect(result).toEqual({
+            index: 'index.md',
         });
     });
 

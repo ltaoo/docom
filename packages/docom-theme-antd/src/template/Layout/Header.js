@@ -22,11 +22,19 @@ export default class Header extends React.Component {
         super(props);
 
         const { source } = props;
-        this.navs = Object.keys(source).map((module) => {
-            const { index: { meta: { title: pageTitle } } } = source[module];
+        this.navs = Object.keys(source).map((key) => {
+            const module = source[key];
+            if (module.index) {
+                const { index: { meta: { title: pageTitle } } } = module;
+                return {
+                    title: pageTitle,
+                    pathname: key,
+                };
+            }
+            const { meta: { title: pageTitle } } = module;
             return {
                 title: pageTitle,
-                pathname: module,
+                pathname: key,
             };
         });
     }
@@ -59,7 +67,7 @@ export default class Header extends React.Component {
                 {
                     this.navs.map(nav => (
                         <Menu.Item key={nav.pathname} className="hide-in-home-page">
-                            <Link to={`/${nav.pathname}/index`}>
+                            <Link to={`/${nav.pathname}`}>
                                 {nav.title}
                             </Link>
                         </Menu.Item>
