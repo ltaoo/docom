@@ -88,8 +88,22 @@ module.exports = (argv) => {
                 return;
             }
             const config = configFactory('development', paths);
-            config.resolve.alias.react = path.resolve(paths.entryModule, 'node_modules/react');
-            config.resolve.alias['react-dom'] = path.resolve(paths.entryModule, 'node_modules/react-dom');
+            // todo: 配置 alias 作为 hooks 抽出来，并在 entry-react 中配置
+            debug('entry module path', paths.entryModule);
+            const reactAlia = require.resolve('react', {
+                paths: [
+                    paths.entryModule,
+                ],
+            });
+            config.resolve.alias.react = reactAlia;
+            debug('alias react', reactAlia);
+            const reactDOMAlia = require.resolve('react-dom', {
+                paths: [
+                    paths.entryModule,
+                ],
+            });
+            config.resolve.alias['react-dom'] = reactDOMAlia;
+            debug('alias react-dom', reactDOMAlia);
             if (hooks.beforeCompile) {
                 hooks.beforeCompile.forEach((hook) => {
                     hook(config, docom);

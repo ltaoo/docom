@@ -12,10 +12,6 @@ module.exports = {
             title: '首页',
             path: 'README.md',
         },
-        components: {
-            title: '组件',
-            path: './src/components',
-        },
         develop: {
             title: '开发说明',
             path: './docs/develop',
