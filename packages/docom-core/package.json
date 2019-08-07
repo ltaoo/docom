@@ -61,6 +61,8 @@
     "webpack": "4.29.6",
     "webpack-dev-server": "3.2.1",
     "webpack-manifest-plugin": "2.0.4",
+    "mark-twain": "^2.0.3",
+    "yargs": "^13.2.4",
     "workbox-webpack-plugin": "4.2.0"
   },
   "scripts": {
@@ -120,9 +122,5 @@
       "jest-watch-typeahead/filename",
       "jest-watch-typeahead/testname"
     ]
-  },
-  "devDependencies": {
-    "mark-twain": "^2.0.3",
-    "yargs": "^13.2.4"
   }
 }
