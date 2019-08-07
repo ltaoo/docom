@@ -1,6 +1,6 @@
 {
   "name": "docom-core",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "bin": {
     "docom": "./bin/index.js"
   },
@@ -41,6 +41,7 @@
     "jest-resolve": "24.7.1",
     "jest-watch-typeahead": "0.3.0",
     "jsonml.js": "^0.1.0",
+    "mark-twain": "^2.0.3",
     "mini-css-extract-plugin": "0.5.0",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "pnp-webpack-plugin": "1.2.1",
@@ -61,9 +62,8 @@
     "webpack": "4.29.6",
     "webpack-dev-server": "3.2.1",
     "webpack-manifest-plugin": "2.0.4",
-    "mark-twain": "^2.0.3",
-    "yargs": "^13.2.4",
-    "workbox-webpack-plugin": "4.2.0"
+    "workbox-webpack-plugin": "4.2.0",
+    "yargs": "^13.2.4"
   },
   "scripts": {
     "test": "yarn jest --watch"
