@@ -15,7 +15,8 @@ function removeExt(filename) {
  */
 function splitFilename(filename) {
     const filenameWithoutExt = removeExt(filename);
-    return filenameWithoutExt.replace(/^\.?(?:\\|\/)+/, '').split('/');
+    const normalizedFilename = filenameWithoutExt.split(path.sep).join('/');
+    return normalizedFilename.replace(/^\.?(?:\\|\/)+/, '').split('/');
 }
 
 /**

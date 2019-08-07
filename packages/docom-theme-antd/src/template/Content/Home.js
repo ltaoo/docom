@@ -7,7 +7,7 @@ import { withMarkdown } from '../utils';
 function Home(props) {
     const { content } = props;
     return (
-        <div className="main-container">
+        <div className="main-container" style={{ marginTop: 40 }}>
             {toReactComponent(
                 ['section', { className: 'markdown' }].concat(getChildren(content)),
             )}

@@ -1,3 +1,5 @@
+const path = require('path');
+
 const debug = require('debug')('core:log');
 /**
  *
@@ -15,7 +17,7 @@ function removePrefixPath(pathname) {
  */
 function normalizeFilePath(filepath, module) {
     debug('normalize file path', filepath, module);
-    return filepath.replace(removePrefixPath(module.path), module.key);
+    return filepath.split(path.sep).join('/').replace(removePrefixPath(module.path), module.key);
 }
 
 module.exports = normalizeFilePath;

@@ -1,5 +1,9 @@
 # docom
 
+## 使用说明
+
+每个模块必须包含 `index.md`，这是 `theme-antd` 要求的。
+
 ## 发布说明
 
 在代码合并到 `master` 后，可以进行 `publish`，将包发布到 `npm` 上。
