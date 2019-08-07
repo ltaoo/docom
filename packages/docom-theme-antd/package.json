@@ -27,9 +27,6 @@
     "react-dom": "^16.8.6",
     "react-intl": "^2.9.0",
     "react-router-dom": "^5.0.1",
-    "scrollama": "^2.0.0"
-  },
-  "devDependencies": {
     "@babel/core": "^7.5.4",
     "@babel/plugin-proposal-class-properties": "^7.5.0",
     "css-loader": "^3.0.0",
@@ -37,6 +34,7 @@
     "docom-plugin-toc": "^0.2.0",
     "less": "^3.9.0",
     "less-loader": "^5.0.0",
-    "style-loader": "^0.23.1"
+    "style-loader": "^0.23.1",
+    "scrollama": "^2.0.0"
   }
 }
