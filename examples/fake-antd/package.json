@@ -22,7 +22,8 @@
     ]
   },
   "dependencies": {
-    "docom-core": "^0.2.1",
+    "antd": "^3.21.2",
+    "docom-core": "0.2.3",
     "docom-entry-react": "^0.2.0",
     "docom-theme-antd": "0.2.2"
   }

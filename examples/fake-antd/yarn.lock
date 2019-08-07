@@ -1950,7 +1950,7 @@ ansi-styles@^3.2.0, ansi-styles@^3.2.1:
   dependencies:
     color-convert "^1.9.0"
 
-antd@^3.20.1:
+antd@^3.20.1, antd@^3.21.2:
   version "3.21.2"
   resolved "https://registry.npmjs.org/antd/-/antd-3.21.2.tgz#83232e12ea0257bc6103cf5a23a716290c863831"
   integrity sha512-KwqFhr7UpZGVCB4l7uZj74LgFVGQqdqLULY9QCGgIubiSFcqPl5dzvIz/bIEdqdiYvS72zX+nD0qmQiI5W95kg==
@@ -3913,10 +3913,10 @@ dns-txt@^2.0.2:
   dependencies:
     buffer-indexof "^1.0.0"
 
-docom-core@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.npm.taobao.org/docom-core/download/docom-core-0.2.1.tgz#8e72bfa77e29d40f6b3f51ed40c2828752e6505e"
-  integrity sha1-jnK/p34p1A9rP1HtQMKCh1LmUF4=
+docom-core@0.2.3:
+  version "0.2.3"
+  resolved "https://registry.npmjs.org/docom-core/-/docom-core-0.2.3.tgz#869614629e73e02976eccf1989fe351db052453c"
+  integrity sha512-0aA4jTUsRDdObJ9u6s+M+t9dMrqjt2pdPYmxL7/AelW714ncxHLAlzjOvq8k9laudX78xGCJrE+aWk4RkpdvUw==
   dependencies:
     "@babel/core" "7.4.3"
     "@babel/preset-env" "^7.5.4"
