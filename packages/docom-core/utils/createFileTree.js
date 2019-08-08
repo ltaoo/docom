@@ -57,7 +57,7 @@ function createTreeFromModule(module, files) {
         module,
     );
     if (isDirectory(modulePath)) {
-        const paths = cleanedModulePath.split(path.sep).join('.');
+        const paths = cleanedModulePath.split('/').join('.');
         return {
             [key]: _.get(fileTree, paths),
         };
